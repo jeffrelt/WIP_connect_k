@@ -1,37 +1,45 @@
 #ifndef AISHELL_H
 #define AISHELL_H
 
-#pragma once
-#include "Move.h"
-
+#include "GameBoard.hpp"
 
 // A new AIShell will be created for every move request.
 class AIShell{
 
 public:
-	//these represent the values for each piece type. 
-	static const int AI_PIECE=1;
-	static const int HUMAN_PIECE = -1;
-	static const int NO_PIECE=0;
-
-
+    void setBoard(bool gravity, uint8_t num_col,uint8_t num_row,uint8_t k, Move last_move)
+    {
+        _gravity = gravity;
+        _num_col = num_col;
+        _num_row = num_row;
+        _k = k;
+        _game.setBoard(num_col,num_row);
+        if(last_move.getCol() < 15)
+            enemyMove(last_move);
+    }
+    void enemyMove(Move their_move)
+    {
+        _game.addMove(their_move, cellType::ENEMY);
+    }
+    Move makeMove(int deadline)
+    {
+        for (int col = 0; col<_num_col; col++){
+            for (int row = 0; row<_num_row; row++){
+                if (_game[col][row] == cellType::EMPTY){
+                    _game.addMove(col,row, cellType::US);
+                    return Move(col, row);
+                }
+            }
+        }
+        return Move(0, 0);
+    }
+    
 private:
-	//Do not alter the values of numRows or numcols. 
-	//they are used for deallocating the gameState variable.
-	int numRows; //the total number of rows in the game state.
-	int numCols; //the total number of columns in the game state.
-	int **gameState; //a pointer to a two-dimensional array representing the game state.
-	bool gravityOn; //this will be true if gravity is turned on. It will be false if gravity is turned off.
-	Move lastMove; //this is the move made last by your oppenent. If your opponent has not made a move yet (you move first) then this move will hold the value (-1, -1) instead. 
-	
-
-public: 
-	int deadline; //this is how many milliseconds the AI has to make move. 
-	int k;        // k is the number of pieces a player must get in a row/column/diagonal to win the game. IE in connect 4, this variable would be 4 
-
-	AIShell(int numCols, int numRows, bool gravityOn, int** gameState, Move lastMove);
-	~AIShell();
-	Move makeMove();
+    bool _gravity;
+    uint8_t _num_col;
+    uint8_t _num_row;
+    uint8_t _k;
+    GameBoard _game;
 };
 
 #endif //AISHELL_H
