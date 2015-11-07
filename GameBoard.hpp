@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <array>
 #include "Move.h"
+#include "GameNode.hpp"
 
 enum cellType{ EMPTY=0, BOUNDRY=1, US=2, ENEMY=3 };
 
@@ -86,6 +87,26 @@ public:
     const std::array<Cell,16>& operator[](int col)
     {
         return _board[col];
+    }
+    GameNode* getPossibleMoves(int num_col, int num_row, bool best_only = false)
+    {
+        GameNode* root = nullptr;
+        GameNode* hold;
+        for (int col = 0; col<num_col; col++){
+            for (int row = 0; row<num_row; row++){
+                if (_board[col][row] == cellType::EMPTY){
+                    hold = root;
+                    root = new GameNode;
+                    root->my_move=Move(col,row);
+                    root->next=hold;
+                }
+            }
+        }
+        return root;
+    }
+    int8_t evaluateBoard(int num_col, int num_row, bool our_turn)
+    {
+        return 0;
     }
 private:
     union

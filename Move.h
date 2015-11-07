@@ -9,6 +9,10 @@ class Move
 {
 public:
     Move() {}
+    Move(uint8_t value)
+    {
+        _data = value;
+    }
     Move(const Move& other)
     {
         _data = other._data;
@@ -24,6 +28,10 @@ public:
         return_this._col+=x;
         return_this._row+=y;
         return return_this;
+    }
+    operator uint8_t()const
+    {
+        return _data;
     }
     uint8_t getCol()const
     {
