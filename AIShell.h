@@ -51,17 +51,20 @@ public:
             _game.addMove(last_move, cellType::ENEMY);
         }
         _boardPopulated();
-        _builder = new std::thread(&AIShell::_buildGameTree,this);
+        //_builder = new std::thread(&AIShell::_buildGameTree,this);
     }
     void enemyMove(Move their_move)
     {
         _run = false;
         _move = their_move;
         _move_count++;
+        _game.addMove(_move, cellType::ENEMY);
     }
     Move makeMove(int deadline)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        for(int i = 1; i<=4; ++i)
+            _logic(i);
         _run = false;
         _move_count++;
         return Move(_move);
