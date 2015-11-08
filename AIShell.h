@@ -9,7 +9,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-#define DEBUG_ON
+//#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define D(x) x
@@ -24,12 +24,12 @@ class AIShell{
 public:
     AIShell()
     {
-        _name = "WIP";
+        name = "WIP";
         _builder=nullptr;
     }
-    AIShell(const char* name)
+    AIShell(const char* my_name)
     {
-        _name = name;
+        name = my_name;
         _builder=nullptr;
     }
     ~AIShell()
@@ -73,7 +73,11 @@ public:
         _game.addMove(_move, cellType::US);
         return Move(_move);
     }
-    
+    int isGameover()
+    {
+        return goalTest(_game);
+    }
+    std::string name;
 protected:
     virtual void _boardPopulated()
     {
@@ -126,7 +130,71 @@ protected:
         }
     }
     
-    std::string _name;
+    int goalTest(const GameBoard& board) {
+        //0 no wining move on us or the enemy
+        //positive we are wining
+        //negative we are going to lose
+        int vscore = 0;
+        
+        //column
+        for (int i = 0; i < _num_col; i++) {
+            //row
+            for (int j = 0; j < _num_row; j++) {
+                
+                if (board[i][j] == cellType::US)
+                {
+                    if (vscore < 0)
+                        vscore = 0;
+                    vscore++;
+                }
+                else if (board[i][j] == cellType::ENEMY)
+                {
+                    if (vscore > 0)
+                        vscore = 0;
+                    vscore--;
+                }
+                else if (board[i][j] == cellType::EMPTY)
+                {
+                    vscore = 0;
+                }
+                if (std::abs(vscore) == _k) {
+                    return vscore;
+                }
+            }
+        }
+        
+        int hscore = 0;
+        //row
+        for (int i = 0; i < _num_row; i++) {
+            //column
+            for (int j = 0; j < _num_col ; j++) {
+                
+                if (board[j][i] == cellType::US)
+                {
+                    if (hscore < 0)
+                        hscore = 0;
+                    hscore++;
+                }
+                else if (board[j][i] == cellType::ENEMY)
+                {
+                    if (hscore > 0)
+                        hscore = 0;
+                    hscore--;
+                }
+                else if (board[j][i] == cellType::EMPTY)
+                {
+                    hscore = 0;
+                }
+                if (std::abs(hscore) == _k) {
+                    return hscore;
+                }
+            }
+        }
+        
+        return 0;
+        
+    }
+    
     std::thread* _builder;
     bool _gravity;
     int _num_col;
