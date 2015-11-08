@@ -42,15 +42,12 @@ protected:
         bool our_turn = turn&1;
         int16_t val;
         if(!*root)
-        {
             *root = board.getPossibleMoves(_num_col,_num_row);
-            if(our_turn)
-                best = INT16_MIN;
-            else
-                best = INT16_MIN;
-        }
+
+        if(our_turn)
+            best = INT16_MIN;
         else
-            best = (*root)->value;
+            best = INT16_MAX;
 
         while(*walker)
         {
@@ -61,23 +58,29 @@ protected:
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
                 val = eval(board,our_turn);
-            
-            (*walker)->value = val;
+            board.removeMove((*walker)->my_move);
+            //(*walker)->value = val;
             if(our_turn)
             {
                 if(val >= beta)
                     return val;
                 if(val > best)
+                {
                     moveToFront(root,walker);
+                    best = val;
+                }
             }
             else
             {
                 if(val <= alpha)
                     return val;
                 if(val < best)
+                {
                     moveToFront(root,walker);
+                    best = val;
+                }
             }
-            board.removeMove((*walker)->my_move);
+            
             walker = &(*walker)->next;
         }
         return best;
@@ -89,7 +92,9 @@ protected:
             _move=_root->my_move;
         }
         catch (...)
-        {}
+        {
+            D(std::cout<<_name<<": Turn over. Made it to Depth "<<target_depth-1<<std::endl;)
+        }
         
         
         /* iterative may be attempted later...
