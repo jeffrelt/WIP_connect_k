@@ -8,7 +8,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-#define DEBUG_ON
+//#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define D(x) x

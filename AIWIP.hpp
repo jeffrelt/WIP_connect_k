@@ -59,7 +59,7 @@ protected:
             else
                 val = eval(board,our_turn);
             board.removeMove((*walker)->my_move);
-            //(*walker)->value = val;
+            (*walker)->value = val;
             if(our_turn)
             {
                 if(val >= beta)
@@ -69,6 +69,8 @@ protected:
                     moveToFront(root,walker);
                     best = val;
                 }
+                else
+                    walker = &(*walker)->next;
             }
             else
             {
@@ -79,9 +81,11 @@ protected:
                     moveToFront(root,walker);
                     best = val;
                 }
+                else
+                    walker = &(*walker)->next;
             }
             
-            walker = &(*walker)->next;
+            
         }
         return best;
     }
@@ -191,24 +195,24 @@ protected:
         diagHelper();
 
 
-        std::cout << "row: " << std::endl;
+        D(std::cout << "row: " << std::endl;)
         for (int i = 0; i < _num_row; i++) {
-            std::cout << _row[i];
+            D(std::cout << _row[i];)
         }
-        std::cout << std::endl;
+        D(std::cout << std::endl;)
 
-        std::cout << "column: " << std::endl;
+        D(std::cout << "column: " << std::endl;)
         for (int i = 0; i < _num_col; i++) {
-            std::cout << _column[i];
+            D(std::cout << _column[i];)
         }
-        std::cout << std::endl;
+        D(std::cout << std::endl;)
 
-        std::cout << "diagonal: " << std::endl;
+        D(std::cout << "diagonal: " << std::endl;)
         for (int col = 0; col < _num_col; col++) {
             for (int row = 0; row < _num_row; row++) {
-                std::cout << _diagonal[col][row];
+               D(std::cout << _diagonal[col][row];)
             }
-            std::cout << std::endl;
+            D(std::cout << std::endl;)
         }
     }
 
@@ -349,7 +353,7 @@ protected:
 
     //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard& board, bool our_turn)    {
-        std::cout << "start eval" << std::endl;
+        //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;
         //i is column
