@@ -38,6 +38,17 @@ struct Cell{
     {
         return (cellType)lhs._cell <= rhs;
     }
+    friend
+    std::ostream& operator << (std::ostream& out, const Cell& cell)
+    {
+        if( cell == cellType::EMPTY)
+            out<<' ';
+        else if( cell == cellType::US)
+            out<<'X';
+        else
+            out<<'O';
+        return out;
+    }
 private:
     char _cell;
 };
