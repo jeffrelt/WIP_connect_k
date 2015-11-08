@@ -43,9 +43,9 @@ protected:
         int val;
         if (!*root)
             *root = board.getPossibleMoves(_num_col, _num_row);
-        if(!*root)
+        if (!*root)
             return val = eval(board, !our_turn);
-        
+
         if (our_turn)
             best = INT_MIN;
         else
@@ -290,23 +290,16 @@ protected:
 
 
     int goalTest(const GameBoard& board) {
-        int goal = 0;
-        if (_k == 2)
-            goal = 1;
-        else if (_k == 3)
-            goal = 2;
-        else
-            goal = _k - 1;
-
         //0 no wining move on us or the enemy
-        //1 we are wining
-        //-1 we are going to lose
+        //positive we are wining
+        //negative we are going to lose
         int vscore = 0;
 
         //column
         for (int i = 0; i < _num_col; i++) {
             //row
             for (int j = 0; j < _num_row; j++) {
+
                 if (board[i][j] == cellType::US)
                 {
                     if (vscore < 0)
@@ -323,8 +316,9 @@ protected:
                 {
                     vscore = 0;
                 }
-                if (std::abs(vscore) == goal)
+                if (std::abs(vscore) == _k) {
                     return vscore;
+                }
             }
         }
 
@@ -350,8 +344,9 @@ protected:
                 {
                     hscore = 0;
                 }
-                if (std::abs(hscore) == goal)
+                if (std::abs(hscore) == _k) {
                     return hscore;
+                }
             }
         }
 
@@ -359,8 +354,18 @@ protected:
 
     }
 
-    //call this to eval the gameboard everything else I added are just to build scoring sheets
-    int eval(const GameBoard& board, bool our_turn)    {
+//call this to eval the gameboard everything else I added are just to build scoring sheets
+    int eval(const GameBoard & board, bool our_turn)    {
+        /*
+        std::cout << "*************************" << std::endl;
+        for (int i = 0; i < _num_row; i++) {
+            //column
+            for (int j = 0; j < _num_col ; j++) {
+                std::cout << board[j][i];
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "*************************" << std::endl;*/
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;
@@ -376,7 +381,13 @@ protected:
                 }
             }
         }
-        return AIscore - HMscore + 100 * goalTest(board);
+
+        int score = AIscore - HMscore + 100 * goalTest(board);/*
+        std::cout << "score: " <<  score << std::endl;
+        std::cout << "AIscore: " <<  AIscore << std::endl;
+        std::cout << "HMscore: " << HMscore << std::endl;
+        std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
+        return score;
     }
 
 
