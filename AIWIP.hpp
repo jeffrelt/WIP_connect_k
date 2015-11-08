@@ -11,6 +11,8 @@
 
 #include "AIShell.h"
 
+#include <vector>
+
 class AIWIP: public AIShell{
 public:
     AIWIP()
@@ -18,52 +20,127 @@ public:
     AIWIP(const char* name) : AIShell(name)
     {}
 protected:
+    
     virtual void _boardPopulated()
     {
         buildScoring();
     }
+    void moveToFront(GameNode** old_head, GameNode** new_head)
+    {
+        if(old_head==new_head)
+            return;
+        GameNode* hold = *new_head;
+        *new_head=hold->next;
+        hold->next=*old_head;
+        *old_head = hold;
+    }
+    int8_t ids(int16_t alpha, int16_t beta, GameNode** root, GameBoard board, unsigned int remaining_depth, cellType turn)
+    {
+        int16_t best;
+        GameNode** walker = root;
+        unsigned int next_depth = remaining_depth-1;
+        cellType next_turn = (cellType)(turn^1);
+        bool our_turn = turn&1;
+        int16_t val;
+        if(!*root)
+        {
+            *root = board.getPossibleMoves(_num_col,_num_row);
+            if(our_turn)
+                best = INT16_MIN;
+            else
+                best = INT16_MIN;
+        }
+        else
+            best = (*root)->value;
+
+        while(*walker)
+        {
+            if(!_run)
+                throw 1;
+            board.addMove((*walker)->my_move,turn);
+            if(next_depth)
+                val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
+            else
+                val = eval(board,our_turn);
+            
+            (*walker)->value = val;
+            if(our_turn)
+            {
+                if(val >= beta)
+                    return val;
+                if(val > best)
+                    moveToFront(root,walker);
+            }
+            else
+            {
+                if(val <= alpha)
+                    return val;
+                if(val < best)
+                    moveToFront(root,walker);
+            }
+            board.removeMove((*walker)->my_move);
+            walker = &(*walker)->next;
+        }
+        return best;
+    }
     virtual void _logic(unsigned int target_depth)
     {
-        unsigned int depth = 1;
-        cellType turn = cellType(2|(_move_count&1));
-        _tree_game = _game;
-        alpha=INT8_MIN;
-        beta=INT8_MAX;
+        try{
+            ids(INT16_MIN, INT16_MAX, &_root, _game, target_depth, cellType(2|(_move_count&1)));
+            _move=_root->my_move;
+        }
+        catch (...)
+        {}
+        
+        
+        /* iterative may be attempted later...
         GameNode** walker = &_root;
         while(_run)
         {
-            if(*walker)
-            {
-                
-            }
-            else
+            if(!*walker)
             {
                 *walker = _tree_game.getPossibleMoves(_num_col,_num_row);
                 GameNode* grader = *walker;
                 while(grader)
                 {
                     _tree_game.addMove(grader->my_move,turn);
-                    grader->value=eval(_tree_game);
+                    if(depth < target_depth)
+                    grader->value=eval(_tree_game, turn&1);
                     _tree_game.removeMove(grader->my_move);
-                    
-                    /* alpha beta pruning here
+                    grader=grader->getNext();
                     if(turn==cellType::US)
                     {
-                        if
+                        // Alpha/beta pruning goes here
+                        
                     }
-                     */
                 }
             }
+            else if(depth<target_depth)
+            {
+                
+            }
         }
+         */
     }
-    
     virtual void _cleanTree()
     {
+        if(!_root)
+            return;
+        GameNode* walker = _root;
+        GameNode* hold = nullptr;
+        while(walker->next && walker->next->my_move != _move)
+            walker = walker->next;
+        if(walker->next)
+        {
+            hold = walker->child;
+            walker->child = nullptr;
+        }
         
+        delete _root;
+        _root = hold;
     }
     int8_t alpha, beta;
     GameNode *_root;
-    GameBoard _tree_game;
     
     /* what is in AIShell.h:
      std::string _name;
@@ -203,19 +280,19 @@ protected:
             for (int j = 0; j < _num_row; j++) {
                 if (std::abs(score) == goal)
                     return score;
-                if (_tree_game[i][j] == cellType::US)
+                if (board[i][j] == cellType::US)
                 {
                     if (score < 0)
                         score = 0;
                     score++;
                 }
-                else if (_tree_game[i][j] == cellType::ENEMY)
+                else if (board[i][j] == cellType::ENEMY)
                 {
                     if (score > 0)
                         score = 0;
                     score--;
                 }
-                else if (_tree_game[i][j] == cellType::EMPTY)
+                else if (board[i][j] == cellType::EMPTY)
                 {
                     score = 0;
                 }

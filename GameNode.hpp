@@ -9,25 +9,23 @@
 #ifndef GameNode_hpp
 #define GameNode_hpp
 
-
-#include "Node.hpp"
 #include "Move.h"
 
 
-class GameNode : public Node{
-public:
-    GameNode* getChild()
+struct GameNode {
+    GameNode() : child(nullptr), next(nullptr)
+    {}
+    ~GameNode()
     {
-        return static_cast<GameNode*>(child);
+        if(next)
+            delete next;
+        if(child)
+            delete child;
     }
-    GameNode* getNext()
-    {
-        return static_cast<GameNode*>(Node::next);
-    }
-    
     Move my_move;
-    int8_t value;
-    Node* child;
+    int16_t value;
+    GameNode* child;
+    GameNode* next;
 };
 
 

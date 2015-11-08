@@ -72,9 +72,9 @@ protected:
     {
         // for the children...
     }
-    virtual void _logic(int depth)
+    virtual void _logic(unsigned int target_depth)
     {
-        if(depth == 1)
+        if(target_depth == 1)
         {
             for (int col = 0; col<_num_col; col++)
                 for (int row = 0; row<_num_row; row++)

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include "AIShell.h"
+#include "AIWIP.hpp"
 
 
 void say(const char* message)
@@ -46,7 +46,7 @@ int main() {
     int which = 1;
     bool gravity = false;
     Move last_move;
-    AIShell shell;
+    AIWIP shell;
     say("Loading Board");
     while( dump.compare("makeMoveWithState:") )
         std::cin >> dump;

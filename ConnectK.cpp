@@ -10,25 +10,27 @@
 #include <string>
 #include <cstdlib>
 #include "AIShell.h"
-
+#include "AIWIP.hpp"
 
 
 int main() {
     Move last_move(-1,-1);
-    AIShell shell[2];
+    AIShell* AI[2];
+    AI[0] = new AIShell("p0");
+    AI[1] = new AIWIP("p1");
     int which = 1;
     std::cout<<"Player #"<<" moved: (col row):"<<std::endl;
-    shell[0].setBoard(false,8,8,4,last_move);
-    last_move = shell[0].makeMove(1);
+    AI[0]->setBoard(false,8,8,4,last_move);
+    last_move = AI[0]->makeMove(2000);
     std::cout<<0<<" moved: "<<last_move<<std::endl;
-    shell[1].setBoard(false,8,8,4,last_move);
+    AI[1]->setBoard(false,8,8,4,last_move);
     
     
     for(int i = 0; i<16;++i){
-        last_move = shell[which].makeMove(1);
+        last_move = AI[which]->makeMove(2000);
         std::cout<<which<<" moved: "<<last_move<<std::endl;
         which^=1;
-        shell[which].enemyMove(last_move);
+        AI[which]->enemyMove(last_move);
     }
     return 0;
 }
