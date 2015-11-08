@@ -92,9 +92,9 @@ protected:
     virtual void _logic(int target_depth)
     {
         try {
-            ids(INT_MAX, INT_MIN, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
+            int best = ids(INT_MAX, INT_MIN, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             _move = _root->my_move;
-            D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< std::endl;)
+            D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
         }
         catch (...)
         {

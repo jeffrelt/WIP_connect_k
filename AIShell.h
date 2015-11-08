@@ -68,6 +68,7 @@ public:
             _logic(i);
         //_run = false;
         _move_count++;
+        _game.addMove(_move, cellType::US);
         return Move(_move);
     }
     
