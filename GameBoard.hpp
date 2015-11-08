@@ -14,7 +14,7 @@
 #include "Move.h"
 #include "GameNode.hpp"
 
-enum cellType{ EMPTY=0, BOUNDRY=1, US=2, ENEMY=3 };
+enum cellType{ EMPTY=0, BOUNDRY=1, ENEMY=2, US=3 };
 
 
 
@@ -84,7 +84,7 @@ public:
         _board[col][row]=cellType::EMPTY;
         return true;
     }
-    const std::array<Cell,16>& operator[](int col)
+    const std::array<Cell,16>& operator[](int col)const
     {
         return _board[col];
     }

@@ -11,9 +11,8 @@
 
 #include "AIShell.h"
 
-#include <vector>
 
-class AIWIP: public AIShell{
+class AIWIP: public AIShell {
 public:
     AIWIP()
     {}
@@ -101,7 +100,7 @@ protected:
             {
                 *walker = _tree_game.getPossibleMoves(_num_col,_num_row);
                 GameNode* grader = *walker;
-                while(grader)
+                while (grader)
                 {
                     _tree_game.addMove(grader->my_move,turn);
                     if(depth < target_depth)
@@ -139,7 +138,6 @@ protected:
         delete _root;
         _root = hold;
     }
-    int8_t alpha, beta;
     GameNode *_root;
     
     /* what is in AIShell.h:
@@ -154,8 +152,8 @@ protected:
      std::atomic<bool> _run;
      std::atomic<unsigned int> _move_count;
      */
-    
-//heuristic stuff:
+
+    //heuristic stuff:
     
     int *_row; //socring for thw row
     int *_column;  //socring for the column
@@ -274,31 +272,57 @@ protected:
         //0 no wining move on us or the enemy
         //1 we are wining
         //-1 we are going to lose
-        int score = 0;
+        int vscore = 0;
         
         for (int i = 0; i < _num_col; i++) {
             for (int j = 0; j < _num_row; j++) {
-                if (std::abs(score) == goal)
-                    return score;
+                if (std::abs(vscore) == goal)
+                    return vscore;
                 if (board[i][j] == cellType::US)
                 {
-                    if (score < 0)
-                        score = 0;
-                    score++;
+                    if (vscore < 0)
+                        vscore = 0;
+                    vscore++;
                 }
                 else if (board[i][j] == cellType::ENEMY)
                 {
-                    if (score > 0)
-                        score = 0;
-                    score--;
+                    if (vscore > 0)
+                        vscore = 0;
+                    vscore--;
                 }
                 else if (board[i][j] == cellType::EMPTY)
                 {
-                    score = 0;
+                    vscore = 0;
                 }
             }
         }
+        
+        int hscore = 0;
+        for (int i = 0; i < _num_row; i++) {
+            for (int j = 0; j < _num_col ; j++) {
+                if (std::abs(hscore) == goal)
+                    return hscore;
+                if (board[j][i] == cellType::US)
+                {
+                    if (hscore < 0)
+                        hscore = 0;
+                    hscore++;
+                }
+                else if (board[j][i] == cellType::ENEMY)
+                {
+                    if (hscore > 0)
+                        hscore = 0;
+                    hscore--;
+                }
+                else if (board[j][i] == cellType::EMPTY)
+                {
+                    hscore = 0;
+                }
+            }
+        }
+        
         return 0;
+        
     }
     
     //call this to eval the gameboard everything else I added are just to build scoring sheets
@@ -317,9 +341,9 @@ protected:
                 }
             }
         }
-        return AIscore - HMscore;
+        return AIscore - HMscore + 100 * goalTest(board);
     }
-
+    
     
 };
 
