@@ -19,54 +19,54 @@ public:
     AIWIP(const char* name) : AIShell(name)
     {}
 protected:
-    
+
     virtual void _boardPopulated()
     {
         buildScoring();
     }
     void moveToFront(GameNode** old_head, GameNode** new_head)
     {
-        if(old_head==new_head)
+        if (old_head == new_head)
             return;
         GameNode* hold = *new_head;
-        *new_head=hold->next;
-        hold->next=*old_head;
+        *new_head = hold->next;
+        hold->next = *old_head;
         *old_head = hold;
     }
     int8_t ids(int16_t alpha, int16_t beta, GameNode** root, GameBoard board, unsigned int remaining_depth, cellType turn)
     {
         int16_t best;
         GameNode** walker = root;
-        unsigned int next_depth = remaining_depth-1;
-        cellType next_turn = (cellType)(turn^1);
-        bool our_turn = turn&1;
+        unsigned int next_depth = remaining_depth - 1;
+        cellType next_turn = (cellType)(turn ^ 1);
+        bool our_turn = turn & 1;
         int16_t val;
-        if(!*root)
-            *root = board.getPossibleMoves(_num_col,_num_row);
+        if (!*root)
+            *root = board.getPossibleMoves(_num_col, _num_row);
 
-        if(our_turn)
+        if (our_turn)
             best = INT16_MIN;
         else
             best = INT16_MAX;
 
-        while(*walker)
+        while (*walker)
         {
-            if(!_run)
+            if (!_run)
                 throw 1;
-            board.addMove((*walker)->my_move,turn);
-            if(next_depth)
+            board.addMove((*walker)->my_move, turn);
+            if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval(board,our_turn);
+                val = eval(board, our_turn);
             board.removeMove((*walker)->my_move);
             (*walker)->value = val;
-            if(our_turn)
+            if (our_turn)
             {
-                if(val >= beta)
+                if (val >= beta)
                     return val;
-                if(val > best)
+                if (val > best)
                 {
-                    moveToFront(root,walker);
+                    moveToFront(root, walker);
                     best = val;
                 }
                 else
@@ -74,33 +74,33 @@ protected:
             }
             else
             {
-                if(val <= alpha)
+                if (val <= alpha)
                     return val;
-                if(val < best)
+                if (val < best)
                 {
-                    moveToFront(root,walker);
+                    moveToFront(root, walker);
                     best = val;
                 }
                 else
                     walker = &(*walker)->next;
             }
-            
-            
+
+
         }
         return best;
     }
     virtual void _logic(unsigned int target_depth)
     {
-        try{
-            ids(INT16_MIN, INT16_MAX, &_root, _game, target_depth, cellType(2|(_move_count&1)));
-            _move=_root->my_move;
+        try {
+            ids(INT16_MIN, INT16_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
+            _move = _root->my_move;
         }
         catch (...)
         {
-            D(std::cout<<_name<<": Turn over. Made it to Depth "<<target_depth-1<<std::endl;)
+            D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }
-        
-        
+
+
         /* iterative may be attempted later...
         GameNode** walker = &_root;
         while(_run)
@@ -119,36 +119,36 @@ protected:
                     if(turn==cellType::US)
                     {
                         // Alpha/beta pruning goes here
-                        
+
                     }
                 }
             }
             else if(depth<target_depth)
             {
-                
+
             }
         }
          */
     }
     virtual void _cleanTree()
     {
-        if(!_root)
+        if (!_root)
             return;
         GameNode* walker = _root;
         GameNode* hold = nullptr;
-        while(walker->next && walker->next->my_move != _move)
+        while (walker->next && walker->next->my_move != _move)
             walker = walker->next;
-        if(walker->next)
+        if (walker->next)
         {
             hold = walker->child;
             walker->child = nullptr;
         }
-        
+
         delete _root;
         _root = hold;
     }
     GameNode *_root;
-    
+
     /* what is in AIShell.h:
      std::string _name;
      std::thread* _builder;
@@ -163,7 +163,7 @@ protected:
      */
 
     //heuristic stuff:
-    
+
     int *_row; //socring for thw row
     int *_column;  //socring for the column
     int **_diagonal;
@@ -210,7 +210,7 @@ protected:
         D(std::cout << "diagonal: " << std::endl;)
         for (int col = 0; col < _num_col; col++) {
             for (int row = 0; row < _num_row; row++) {
-               D(std::cout << _diagonal[col][row];)
+                D(std::cout << _diagonal[col][row];)
             }
             D(std::cout << std::endl;)
         }
@@ -300,8 +300,6 @@ protected:
         for (int i = 0; i < _num_col; i++) {
             //row
             for (int j = 0; j < _num_row; j++) {
-                if (std::abs(vscore) == goal)
-                    return vscore;
                 if (board[i][j] == cellType::US)
                 {
                     if (vscore < 0)
@@ -318,6 +316,8 @@ protected:
                 {
                     vscore = 0;
                 }
+                if (std::abs(vscore) == goal)
+                    return vscore;
             }
         }
 
@@ -326,8 +326,7 @@ protected:
         for (int i = 0; i < _num_row; i++) {
             //column
             for (int j = 0; j < _num_col ; j++) {
-                if (std::abs(hscore) == goal)
-                    return hscore;
+
                 if (board[j][i] == cellType::US)
                 {
                     if (hscore < 0)
@@ -344,6 +343,8 @@ protected:
                 {
                     hscore = 0;
                 }
+                if (std::abs(hscore) == goal)
+                    return hscore;
             }
         }
 
