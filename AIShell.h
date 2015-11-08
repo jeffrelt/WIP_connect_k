@@ -43,6 +43,7 @@ public:
         _num_row = num_row;
         _k = k;
         _move_count = 0;
+        _run = true;
         _game.setBoard(num_col,num_row);
         if(last_move.getCol() < 15)
         {
@@ -53,12 +54,14 @@ public:
     }
     void enemyMove(Move their_move)
     {
+        _run = false;
         _move = their_move;
         _move_count++;
     }
     Move makeMove(int deadline)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        _run = false;
         _move_count++;
         return Move(_move);
     }
@@ -69,33 +72,30 @@ protected:
         if(depth == 1)
         {
             for (int col = 0; col<_num_col; col++)
-            {
                 for (int row = 0; row<_num_row; row++)
-                {
                     if (_game[col][row] == cellType::EMPTY)
                     {
                         _move = Move(col, row);
                         return;
                     }
-                }
-            }
         }
         else
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    
+    virtual void _cleanTree()
+    {
+        // this shell has nothing to clean...
+    }
     void _buildGameTree()
     {
-        unsigned int count = _move_count;
         unsigned int depth = 1;
         while(1)
         {
             _logic(depth);
-            if(count == _move_count)
+            if(_run)
                 depth++;
             else
             {
-                count = _move_count;
                 Move m(_move);
                 depth = 1;
                 if(_move_count & 1)
@@ -108,6 +108,8 @@ protected:
                     _game.addMove(m, cellType::ENEMY);
                     D(std::cout<<_name<<": Enemy moved "<<m<<std::endl;)
                 }
+                _cleanTree();
+                _run = true;
             }
         }
     }
@@ -118,9 +120,9 @@ protected:
     uint8_t _num_col;
     uint8_t _num_row;
     uint8_t _k;
-    uint8_t _status;
     GameBoard _game;
     uint8_t _move;
+    std::atomic<bool> _run;
     std::atomic<unsigned int> _move_count;
 };
 

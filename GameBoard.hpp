@@ -96,6 +96,8 @@ public:
             for (int row = 0; row<num_row; row++){
                 if (_board[col][row] == cellType::EMPTY){
                     hold = root;
+                    // NOTE: here we create a GameNode - this will change later
+                    // it is the callers responsibility to delete it
                     root = new GameNode;
                     root->my_move=Move(col,row);
                     root->next=hold;
@@ -104,10 +106,7 @@ public:
         }
         return root;
     }
-    int8_t evaluateBoard(int num_col, int num_row, bool our_turn)
-    {
-        return 0;
-    }
+
 private:
     union
     {
