@@ -14,7 +14,7 @@
 #include "Move.h"
 #include "GameNode.hpp"
 
-enum cellType{ EMPTY=0, BOUNDRY=1, ENEMY=2, US=3 };
+enum cellType{ EMPTY=0, BOUNDRY=1, US=2, ENEMY=3 };
 
 
 
@@ -39,25 +39,23 @@ struct Cell{
         return (cellType)lhs._cell <= rhs;
     }
 private:
-    uint8_t _cell;
+    char _cell;
 };
 
 class GameBoard{
 public:
     GameBoard operator = (GameBoard& other)
     {
-        _raw = other._raw;
+        _board = other._board;
         return *this;
     }
-    void setBoard(uint8_t col, uint8_t row)
+    void setBoard(int col, int row)
     {
         //Wipe the board
-        for(auto& col: _raw)
-            col = 0;
         //set the boundies when less than 16x16
-        for(int i = col; i<16; ++i)
-            for(int j = row; j<16; ++j)
-                _board[col][row]=cellType::BOUNDRY;
+        for(int i = 0; i<col; ++i)
+            for(int j = 0; j<row; ++j)
+                _board[col][row]=cellType::EMPTY;
     }
     bool addMove(Move where, cellType who)
     {
@@ -108,11 +106,7 @@ public:
     }
 
 private:
-    union
-    {
-        std::array<std::array<Cell,16>,16> _board;
-        std::array<uint32_t,16> _raw;
-    };
+    std::array<std::array<Cell,16>,16> _board;
 };
 
 #endif //GameBoard_hpp

@@ -2,56 +2,48 @@
 #define MOVE_H
 
 #pragma once
-#include <cstdint>
 #include <iostream>
 
 class Move
 {
 public:
     Move() {}
-    Move(uint8_t value)
-    {
-        _data = value;
-    }
-    Move(const Move& other)
-    {
-        _data = other._data;
-    }
-    Move(uint8_t x, uint8_t y)
+    Move(int x, int y)
     {
         _col=x;
         _row=y;
     }
-    Move move(uint8_t x, uint8_t y)
+    Move(const Move& other)
+    {
+        _col=other._col;
+        _row=other._row;
+    }
+    Move move(int x, int y)
     {
         Move return_this(*this);
         return_this._col+=x;
         return_this._row+=y;
         return return_this;
     }
-    operator uint8_t()const
-    {
-        return _data;
-    }
-    uint8_t getCol()const
+    int getCol()const
     {
         return _col;
     }
-    uint8_t getRow()const
+    int getRow()const
     {
         return _row;
     }
-    void setCol(uint8_t col)
+    void setCol(int col)
     {
         _col = col;
     }
-    void setRow(uint8_t row)
+    void setRow(int row)
     {
         _row = row;
     }
-    bool operator == (const Move& other)const
+    bool operator !=(const Move& other)
     {
-        return _data == other._data;
+        return (_col != other._col ||_row != other._row);
     }
     friend
     std::istream& operator >> (std::istream& in, Move& move)
@@ -76,13 +68,10 @@ public:
     
 private:
 // data - just 1 byte
-    union{
-        struct{
-            uint8_t _row:4;
-            uint8_t _col:4;
-        };
-        uint8_t _data;
-    };
+    
+    int _row;
+    int _col;
+
     
 };
 

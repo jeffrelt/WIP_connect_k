@@ -33,21 +33,21 @@ protected:
         hold->next = *old_head;
         *old_head = hold;
     }
-    int8_t ids(int16_t alpha, int16_t beta, GameNode** root, GameBoard board, unsigned int remaining_depth, cellType turn)
+    int8_t ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
     {
-        int16_t best;
+        int best;
         GameNode** walker = root;
-        unsigned int next_depth = remaining_depth - 1;
+        int next_depth = remaining_depth - 1;
         cellType next_turn = (cellType)(turn ^ 1);
-        bool our_turn = turn & 1;
-        int16_t val;
+        bool our_turn = !(turn & 1);
+        int val;
         if (!*root)
             *root = board.getPossibleMoves(_num_col, _num_row);
 
         if (our_turn)
-            best = INT16_MIN;
+            best = INT_MIN;
         else
-            best = INT16_MAX;
+            best = INT_MAX;
 
         while (*walker)
         {
@@ -62,7 +62,7 @@ protected:
             (*walker)->value = val;
             if (our_turn)
             {
-                if (val >= beta)
+                if (val <= beta)
                     return val;
                 if (val > best)
                 {
@@ -74,7 +74,7 @@ protected:
             }
             else
             {
-                if (val <= alpha)
+                if (val >= alpha)
                     return val;
                 if (val < best)
                 {
@@ -89,15 +89,16 @@ protected:
         }
         return best;
     }
-    virtual void _logic(unsigned int target_depth)
+    virtual void _logic(int target_depth)
     {
         try {
-            ids(INT16_MIN, INT16_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
+            ids(INT_MAX, INT_MIN, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             _move = _root->my_move;
+            D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< std::endl;)
         }
         catch (...)
         {
-            D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
+            //D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }
 
 

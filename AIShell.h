@@ -8,7 +8,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-//#define DEBUG_ON
+#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define D(x) x
@@ -36,7 +36,7 @@ public:
         if(_builder)
             delete _builder;
     }
-    void setBoard(bool gravity, uint8_t num_col,uint8_t num_row,uint8_t k, Move last_move)
+    void setBoard(bool gravity, int num_col,int num_row,int k, Move last_move)
     {
         _gravity = gravity;
         _num_col = num_col;
@@ -45,7 +45,7 @@ public:
         _move_count = 0;
         _run = true;
         _game.setBoard(num_col,num_row);
-        if(last_move.getCol() < 15)
+        if(last_move.getCol() != -1)
         {
             D(std::cout<<_name<<": Enemy moved "<<last_move<<std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
@@ -72,7 +72,7 @@ protected:
     {
         // for the children...
     }
-    virtual void _logic(unsigned int target_depth)
+    virtual void _logic(int target_depth)
     {
         if(target_depth == 1)
         {
@@ -122,13 +122,13 @@ protected:
     std::string _name;
     std::thread* _builder;
     bool _gravity;
-    uint8_t _num_col;
-    uint8_t _num_row;
-    uint8_t _k;
+    int _num_col;
+    int _num_row;
+    int _k;
     GameBoard _game;
-    uint8_t _move;
+    Move _move;
     std::atomic<bool> _run;
-    std::atomic<unsigned int> _move_count;
+    std::atomic<int> _move_count;
 };
 
 #endif //AISHELL_H

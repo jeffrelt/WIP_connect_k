@@ -46,7 +46,7 @@ int main() {
     int which = 1;
     bool gravity = false;
     Move last_move;
-    AIWIP shell;
+    AIShell shell;
     say("Loading Board");
     while( dump.compare("makeMoveWithState:") )
         std::cin >> dump;
