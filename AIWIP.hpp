@@ -43,7 +43,7 @@ protected:
                 while(grader)
                 {
                     _tree_game.addMove(grader->my_move,turn);
-                    grader->value=eval();
+                    grader->value=eval(_tree_game);
                     _tree_game.removeMove(grader->my_move);
                     
                     /* alpha beta pruning here
@@ -65,7 +65,7 @@ protected:
     GameNode *_root;
     GameBoard _tree_game;
     
-    /* from AIShell.h:
+    /* what is in AIShell.h:
      std::string _name;
      std::thread* _builder;
      bool _gravity;
@@ -185,7 +185,7 @@ protected:
     }
     
     
-    int goalTest() {
+    int goalTest(const GameBoard& board) {
         int goal = 0;
         if (_k == 2)
             goal = 1;
@@ -225,17 +225,17 @@ protected:
     }
     
     //call this to eval the gameboard everything else I added are just to build scoring sheets
-    int eval()    {
+    int eval(const GameBoard& board, bool our_turn)    {
         int AIscore = 0;
         int HMscore = 0;
         //i is column
         for (int i = 0; i < _num_col; i++) {
             //j is row
             for (int j = 0; j < _num_row ; j++) {
-                if (_tree_game[i][j] == cellType::US) {
+                if (board[i][j] == cellType::US) {
                     AIscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
                 }
-                else if (_tree_game[i][j] == cellType::ENEMY) {
+                else if (board[i][j] == cellType::ENEMY) {
                     HMscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
                 }
             }
