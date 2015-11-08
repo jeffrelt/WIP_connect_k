@@ -20,10 +20,10 @@ int main() {
     AI[1] = new AIWIP("p1");
     int which = 1;
     std::cout<<"Player #"<<" moved: (col row):"<<std::endl;
-    AI[0]->setBoard(false,8,8,4,last_move);
+    AI[0]->setBoard(false,3,3,3,last_move);
     last_move = AI[0]->makeMove(2000);
     std::cout<<0<<" moved: "<<last_move<<std::endl;
-    AI[1]->setBoard(false,8,8,4,last_move);
+    AI[1]->setBoard(false,3,3,3,last_move);
     
     
     for(int i = 0; i<16;++i){

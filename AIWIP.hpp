@@ -98,7 +98,7 @@ protected:
         }
         catch (...)
         {
-            //D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
+            D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }
 
 

@@ -56,7 +56,7 @@ public:
     }
     void enemyMove(Move their_move)
     {
-        _run = false;
+        //_run = false;
         _move = their_move;
         _move_count++;
         _game.addMove(_move, cellType::ENEMY);
@@ -66,7 +66,7 @@ public:
         //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
         for(int i = 1; i<=4; ++i)
             _logic(i);
-        _run = false;
+        //_run = false;
         _move_count++;
         return Move(_move);
     }
