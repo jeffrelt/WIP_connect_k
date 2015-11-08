@@ -11,7 +11,7 @@
 
 #include "AIShell.h"
 
-class AIWIP: public AIShell{
+class AIWIP: public AIShell {
 public:
     AIWIP()
     {}
@@ -25,27 +25,27 @@ protected:
     virtual void _logic(unsigned int target_depth)
     {
         unsigned int depth = 1;
-        cellType turn = cellType(2|(_move_count&1));
+        cellType turn = cellType(2 | (_move_count & 1));
         _tree_game = _game;
-        alpha=INT8_MIN;
-        beta=INT8_MAX;
+        alpha = INT8_MIN;
+        beta = INT8_MAX;
         GameNode** walker = &_root;
-        while(_run)
+        while (_run)
         {
-            if(*walker)
+            if (*walker)
             {
-                
+
             }
             else
             {
-                *walker = _tree_game.getPossibleMoves(_num_col,_num_row);
+                *walker = _tree_game.getPossibleMoves(_num_col, _num_row);
                 GameNode* grader = *walker;
-                while(grader)
+                while (grader)
                 {
-                    _tree_game.addMove(grader->my_move,turn);
-                    grader->value=eval(_tree_game);
+                    _tree_game.addMove(grader->my_move, turn);
+                    grader->value = eval(_tree_game);
                     _tree_game.removeMove(grader->my_move);
-                    
+
                     /* alpha beta pruning here
                     if(turn==cellType::US)
                     {
@@ -56,15 +56,15 @@ protected:
             }
         }
     }
-    
+
     virtual void _cleanTree()
     {
-        
+
     }
     int8_t alpha, beta;
     GameNode *_root;
     GameBoard _tree_game;
-    
+
     /* what is in AIShell.h:
      std::string _name;
      std::thread* _builder;
@@ -77,18 +77,18 @@ protected:
      std::atomic<bool> _run;
      std::atomic<unsigned int> _move_count;
      */
-    
+
 //heuristic stuff:
-    
+
     int *_row; //socring for thw row
     int *_column;  //socring for the column
     int **_diagonal;
-    
-    
+
+
     int calculateMax(uint8_t number)   {
         return (number - _k + 1);
     }
-    
+
     //this only need to be called once per game
     void buildScoring() {
         int col_number = calculateMax(_num_col);
@@ -97,19 +97,19 @@ protected:
         buildHelper(_column, col_number, _num_col);
         buildHelper(_row, row_number, _num_row);
         diagHelper();
-        
+
         std::cout << "row: " << std::endl;
         for (int i = 0; i < _num_row; i++) {
             std::cout << _row[i];
         }
         std::cout << std::endl;
-        
+
         std::cout << "column: " << std::endl;
         for (int i = 0; i < _num_col; i++) {
             std::cout << _column[i];
         }
         std::cout << std::endl;
-        
+
         std::cout << "diagonal: " << std::endl;
         for (int col = 0; col < _num_col; col++) {
             for (int row = 0; row < _num_row; row++) {
@@ -118,19 +118,19 @@ protected:
             std::cout << std::endl;
         }
     }
-    
+
     void diagHelper() {
         int ** temp = new int* [_k];
         for (int i = 0; i < _k; i++) {
             temp[i] = new int[_k]();
         }
-        
+
         for (int i = 0; i < _k; i++) {
             temp[i][i] = temp[i][i] + 1;
             temp[i][_k - i - 1] = temp[i][_k - i - 1] + 1 ;
         }
         diagApply(temp);
-        
+
     }
     void diagApply(int **kboard) {
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
@@ -142,10 +142,10 @@ protected:
             }
         }
     }
-    
+
     void buildHelper(int *array, int maxium, int size) {
         bool flag = _k < maxium;
-        
+
         int changeIndex = std::max(maxium, (int)_k);
         //ture change from max
         if (flag) {
@@ -163,7 +163,7 @@ protected:
             for (; i < size; i++) {
                 array[i] = temp--;
             }
-            
+
         }
         //false chage from _k
         else {
@@ -183,9 +183,9 @@ protected:
             }
         }
     }
-    
-    
-    int goalTest(const GameBoard& board) {
+
+
+    int goalTest() {
         int goal = 0;
         if (_k == 2)
             goal = 1;
@@ -193,37 +193,63 @@ protected:
             goal = 2;
         else
             goal = _k - 1;
-        
+
         //0 no wining move on us or the enemy
         //1 we are wining
         //-1 we are going to lose
-        int score = 0;
-        
+        int vscore = 0;
+
         for (int i = 0; i < _num_col; i++) {
             for (int j = 0; j < _num_row; j++) {
-                if (std::abs(score) == goal)
-                    return score;
-                if (_tree_game[i][j] == cellType::US)
+                if (std::abs(vscore) == goal)
+                    return vscore;
+                if (_game[i][j] == cellType::US)
                 {
-                    if (score < 0)
-                        score = 0;
-                    score++;
+                    if (vscore < 0)
+                        vscore = 0;
+                    vscore++;
                 }
-                else if (_tree_game[i][j] == cellType::ENEMY)
+                else if (_game[i][j] == cellType::ENEMY)
                 {
-                    if (score > 0)
-                        score = 0;
-                    score--;
+                    if (vscore > 0)
+                        vscore = 0;
+                    vscore--;
                 }
-                else if (_tree_game[i][j] == cellType::EMPTY)
+                else if (_game[i][j] == cellType::EMPTY)
                 {
-                    score = 0;
+                    vscore = 0;
                 }
             }
         }
+
+        int hscore = 0;
+        for (int i = 0; i < _num_row; i++) {
+            for (int j = 0; j < _num_col ; j++) {
+                if (std::abs(hscore) == goal)
+                    return hscore;
+                if (_game[j][i] == cellType::US)
+                {
+                    if (hscore < 0)
+                        hscore = 0;
+                    hscore++;
+                }
+                else if (_game[j][i] == cellType::ENEMY)
+                {
+                    if (hscore > 0)
+                        hscore = 0;
+                    hscore--;
+                }
+                else if (_game[j][i] == cellType::EMPTY)
+                {
+                    hscore = 0;
+                }
+            }
+        }
+
         return 0;
+
     }
-    
+
     //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard& board, bool our_turn)    {
         int AIscore = 0;
@@ -240,10 +266,10 @@ protected:
                 }
             }
         }
-        return AIscore - HMscore;
+        return AIscore - HMscore + 100 * goalTest)();
     }
 
-    
+
 };
 
 #endif /* AIWIP_hpp */
