@@ -60,10 +60,12 @@ public:
         _move = their_move;
         _move_count++;
         _game.addMove(_move, cellType::ENEMY);
+        _cleanTree();
     }
     Move makeMove(int deadline)
     {
         //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        _cleanTree();
         for(int i = 1; i<=4; ++i)
             _logic(i);
         //_run = false;

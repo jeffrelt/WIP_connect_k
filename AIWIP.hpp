@@ -43,7 +43,9 @@ protected:
         int val;
         if (!*root)
             *root = board.getPossibleMoves(_num_col, _num_row);
-
+        if(!*root)
+            return val = eval(board, !our_turn);
+        
         if (our_turn)
             best = INT_MIN;
         else
@@ -62,29 +64,26 @@ protected:
             (*walker)->value = val;
             if (our_turn)
             {
-                if (val <= beta)
-                    return val;
-                if (val > best)
+                if (val > alpha)
                 {
+                    best = alpha = val;
                     moveToFront(root, walker);
-                    best = val;
                 }
                 else
                     walker = &(*walker)->next;
             }
             else
             {
-                if (val >= alpha)
-                    return val;
-                if (val < best)
+                if (val < beta)
                 {
                     moveToFront(root, walker);
-                    best = val;
+                    best = beta = val;
                 }
                 else
                     walker = &(*walker)->next;
             }
-
+            if (alpha >= beta)
+                return best;
 
         }
         return best;
@@ -92,7 +91,7 @@ protected:
     virtual void _logic(int target_depth)
     {
         try {
-            int best = ids(INT_MAX, INT_MIN, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
+            int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             _move = _root->my_move;
             D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
         }
