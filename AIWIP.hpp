@@ -92,8 +92,15 @@ protected:
     {
         try {
             int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
-            _move = _root->my_move;
-            D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
+            if(_root)
+            {
+                _move = _root->my_move;
+                D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
+            }
+            else
+            {
+                D(std::cout << _name << ": Game is over!"<<std::endl;)
+            }
         }
         catch (...)
         {
