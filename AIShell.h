@@ -50,6 +50,7 @@ public:
             D(std::cout<<_name<<": Enemy moved "<<last_move<<std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
         }
+        _boardPopulated();
         _builder = new std::thread(&AIShell::_buildGameTree,this);
     }
     void enemyMove(Move their_move)
@@ -67,6 +68,10 @@ public:
     }
     
 protected:
+    virtual void _boardPopulated()
+    {
+        // for the children...
+    }
     virtual void _logic(int depth)
     {
         if(depth == 1)
@@ -84,7 +89,7 @@ protected:
     }
     virtual void _cleanTree()
     {
-        // this shell has nothing to clean...
+        // for the children...
     }
     void _buildGameTree()
     {

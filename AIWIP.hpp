@@ -18,6 +18,10 @@ public:
     AIWIP(const char* name) : AIShell(name)
     {}
 protected:
+    virtual void _boardPopulated()
+    {
+        buildScoring();
+    }
     virtual void _logic(unsigned int target_depth)
     {
         unsigned int depth = 1;
@@ -74,7 +78,7 @@ protected:
      std::atomic<unsigned int> _move_count;
      */
     
-//Heuristic stuff:
+//heuristic stuff:
     
     int *_row; //socring for thw row
     int *_column;  //socring for the column
