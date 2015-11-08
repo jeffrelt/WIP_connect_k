@@ -5,6 +5,7 @@
 #include <thread>
 #include <utility>
 #include <atomic>
+#include <climits>
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
