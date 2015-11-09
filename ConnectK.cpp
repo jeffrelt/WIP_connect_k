@@ -27,7 +27,7 @@ int main() {
     
     
     for(int i = 0; i<255;++i){
-        last_move = AI[which]->makeMgove(2000);
+        last_move = AI[which]->makeMove(2000);
         std::cout<<which<<" moved: "<<last_move<<std::endl;
         if(AI[which]->isGameover())
             break;
