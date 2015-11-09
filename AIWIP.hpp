@@ -41,7 +41,7 @@ protected:
     }
     virtual void _boardPopulated()
     {
-        //buildScoring();
+        buildScoring();
     }
     virtual void moveToFront(GameNode** old_head, GameNode** new_head)
     {
@@ -74,12 +74,12 @@ protected:
         {
             if (!_run)
                 throw 1;
-            board.addMove((*walker)->my_move, turn);
+            board.addMove((*walker)->my_move, turn, "ids");
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval(board, our_turn, (*walker)->my_move);
-            board.removeMove((*walker)->my_move);
+                val = eval(board, our_turn);
+            board.removeMove((*walker)->my_move, "ids");
             (*walker)->value = val;
             if (our_turn)
             {
@@ -361,7 +361,7 @@ protected:
 
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
-    int eval(const GameBoard & board, bool our_turn, Move what_move)    {
+    int eval(const GameBoard & board, bool our_turn)    {
         
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
@@ -380,7 +380,7 @@ protected:
         }
         int score = AIscore - HMscore + 100 * goalTest(board);
 
-        D(std::cout << "Move: "<<what_move<<" score: " <<  score << std::endl;)
+        D(std::cout << "score: " <<  score << std::endl;)
         /*std::cout << "AIscore: " <<  AIscore << std::endl;
         std::cout << "HMscore: " << HMscore << std::endl;
         std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
