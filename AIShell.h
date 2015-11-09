@@ -19,25 +19,25 @@
 
 
 // A new AIShell will be created for every move request.
-class AIShell{
+class AIShell {
 
 public:
     AIShell()
     {
         name = "WIP";
-        _builder=nullptr;
+        _builder = nullptr;
     }
     AIShell(const char* my_name)
     {
         name = my_name;
-        _builder=nullptr;
+        _builder = nullptr;
     }
     ~AIShell()
     {
-        if(_builder)
+        if (_builder)
             delete _builder;
     }
-    void setBoard(bool gravity, int num_col,int num_row,int k, Move last_move)
+    void setBoard(bool gravity, int num_col, int num_row, int k, Move last_move)
     {
         _gravity = gravity;
         _num_col = num_col;
@@ -45,10 +45,10 @@ public:
         _k = k;
         _move_count = 0;
         _run = true;
-        _game.setBoard(num_col,num_row);
-        if(last_move.getCol() != -1)
+        _game.setBoard(num_col, num_row);
+        if (last_move.getCol() != -1)
         {
-            D(std::cout<<name<<": Enemy moved "<<last_move<<std::endl;)
+            D(std::cout << name << ": Enemy moved " << last_move << std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
         }
         _boardPopulated();
@@ -66,7 +66,7 @@ public:
     {
         //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
         _cleanTree();
-        for(int i = 1; i<=4; ++i)
+        for (int i = 1; i <= 4; ++i)
             _logic(i);
         //_run = false;
         _move_count++;
@@ -85,10 +85,10 @@ protected:
     }
     virtual void _logic(int target_depth)
     {
-        if(target_depth == 1)
+        if (target_depth == 1)
         {
-            for (int col = 0; col<_num_col; col++)
-                for (int row = 0; row<_num_row; row++)
+            for (int col = 0; col < _num_col; col++)
+                for (int row = 0; row < _num_row; row++)
                     if (_game[col][row] == cellType::EMPTY)
                     {
                         _move = Move(col, row);
@@ -105,42 +105,42 @@ protected:
     void _buildGameTree()
     {
         unsigned int depth = 1;
-        while(1)
+        while (1)
         {
             _logic(depth);
-            if(_run)
+            if (_run)
                 depth++;
             else
             {
                 Move m(_move);
                 depth = 1;
-                if(_move_count & 1)
+                if (_move_count & 1)
                 {
                     _game.addMove(m, cellType::US);
-                    D(std::cout<<name<<": I moved "<<m<<std::endl;)
+                    D(std::cout << name << ": I moved " << m << std::endl;)
                 }
                 else
                 {
                     _game.addMove(m, cellType::ENEMY);
-                    D(std::cout<<name<<": Enemy moved "<<m<<std::endl;)
+                    D(std::cout << name << ": Enemy moved " << m << std::endl;)
                 }
                 _cleanTree();
                 _run = true;
             }
         }
     }
-    
+
     int goalTest(const GameBoard& board) {
         //0 no wining move on us or the enemy
         //positive we are wining
         //negative we are going to lose
         int vscore = 0;
-        
+
         //column
         for (int i = 0; i < _num_col; i++) {
             //row
             for (int j = 0; j < _num_row; j++) {
-                
+
                 if (board[i][j] == cellType::US)
                 {
                     if (vscore < 0)
@@ -158,17 +158,17 @@ protected:
                     vscore = 0;
                 }
                 if (std::abs(vscore) == _k) {
-                    return vscore;
+                    return vscore > 0 ? 500:-500;
                 }
             }
         }
-        
+
         int hscore = 0;
         //row
         for (int i = 0; i < _num_row; i++) {
             //column
             for (int j = 0; j < _num_col ; j++) {
-                
+
                 if (board[j][i] == cellType::US)
                 {
                     if (hscore < 0)
@@ -186,15 +186,64 @@ protected:
                     hscore = 0;
                 }
                 if (std::abs(hscore) == _k) {
-                    return hscore;
+                    return hscore > 0 ? 500:-500;
                 }
             }
         }
-        
+
+        int d1score = 0;
+        int d2score = 0;
+        for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
+            for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
+                for (int i = 0; i < _k; i++) {
+                    if (board[boardCol + i][boardRow + i]  == cellType::US)
+                    {
+                        if (d1score < 0)
+                            d1score = 0;
+                        d1score++;
+                    }
+                    else if (board[boardCol + i][boardRow + i] == cellType::ENEMY)
+                    {
+                        if (d1score > 0)
+                            d1score = 0;
+                        d1score--;
+                    }
+                    else if (board[boardCol + i][boardRow + i] == cellType::EMPTY)
+                    {
+                        d1score = 0;
+                    }
+                    if (std::abs(d1score) == _k) {
+                        return d1score > 0 ? 500:-500;
+                    }
+
+
+                    if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::US)
+                    {
+                        if (d2score < 0)
+                            d2score = 0;
+                        d2score++;
+                    }
+                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::ENEMY)
+                    {
+                        if (d2score > 0)
+                            d2score = 0;
+                        d2score--;
+                    }
+                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::EMPTY)
+                    {
+                        d2score = 0;
+                    }
+                    if (std::abs(d2score) == _k) {
+                        return d2score > 0 ? 500:-500;
+                    }
+                }
+            }
+        }
+
         return 0;
-        
+
     }
-    
+
     std::thread* _builder;
     bool _gravity;
     int _num_col;
