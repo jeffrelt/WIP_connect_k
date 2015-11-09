@@ -13,7 +13,7 @@
 #include "AIWIP.hpp"
 
 
-int main() {
+int _main() {
     Move last_move(-1,-1);
     AIShell* AI[2];
     AI[0] = new AIWIP("p0");

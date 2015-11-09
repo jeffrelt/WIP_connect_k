@@ -41,7 +41,7 @@ protected:
     }
     virtual void _boardPopulated()
     {
-        buildScoring();
+        //buildScoring();
     }
     virtual void moveToFront(GameNode** old_head, GameNode** new_head)
     {
@@ -330,7 +330,7 @@ protected:
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard & board, bool our_turn)    {
-
+        return 1;
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;

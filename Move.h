@@ -48,7 +48,7 @@ public:
     friend
     std::istream& operator >> (std::istream& in, Move& move)
     {
-        uint8_t hold;
+        int hold;
         in>>hold;
         move._col = hold;
         in>>hold;

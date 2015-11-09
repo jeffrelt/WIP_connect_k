@@ -66,7 +66,7 @@ public:
         //set the boundies when less than 16x16
         for(int i = 0; i<col; ++i)
             for(int j = 0; j<row; ++j)
-                _board[col][row]=cellType::EMPTY;
+                _board[i][j]=cellType::EMPTY;
     }
     bool addMove(Move where, cellType who)
     {
