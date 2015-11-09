@@ -74,12 +74,14 @@ protected:
         {
             if (!_run)
                 throw 1;
-            board.addMove((*walker)->my_move, turn, "ids");
+            board.addMove((*walker)->my_move, turn);
+            D(std::cout<<name<<": added "<<(*walker)->my_move<<" at depth "<<search_depth-remaining_depth<<std::endl;)
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
                 val = eval(board, our_turn);
-            board.removeMove((*walker)->my_move, "ids");
+            board.removeMove((*walker)->my_move);
+            D(std::cout<<name<<": removed "<<(*walker)->my_move<<" at depth "<<search_depth-remaining_depth<<std::endl;)
             (*walker)->value = val;
             if (our_turn)
             {
@@ -114,6 +116,7 @@ protected:
     virtual void _logic(int target_depth)
     {
         try {
+            search_depth = target_depth;
             int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             if (_root)
             {
@@ -197,6 +200,7 @@ protected:
         }
     }
     GameNode *_root;
+    int search_depth;
 
     /* what is in AIShell.h:
      std::string _name;
@@ -215,7 +219,8 @@ protected:
     
     class EvalObject{
         EvalObject(int k) : _k(k), _last(cellType::BOUNDRY)
-        {}
+        {
+    }
         
         int _k;
         cellType _last;
@@ -380,7 +385,7 @@ protected:
         }
         int score = AIscore - HMscore + 100 * goalTest(board);
 
-        D(std::cout << "score: " <<  score << std::endl;)
+        D(std::cout << name<<": score: " <<  score << std::endl;)
         /*std::cout << "AIscore: " <<  AIscore << std::endl;
         std::cout << "HMscore: " << HMscore << std::endl;
         std::cout << "Goaltest: " << goalTest(board) << std::endl;*/

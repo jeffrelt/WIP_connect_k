@@ -68,41 +68,29 @@ public:
             for(int j = 0; j<row; ++j)
                 _board[i][j]=cellType::EMPTY;
     }
-    bool addMove(Move where, cellType who, const char* note = nullptr)
+    bool addMove(Move where, cellType who)
     {
         int col = where.getCol();
         int row = where.getRow();
         if(_board[col][row]) //not empty
             throw "bad move";
         _board[col][row]=who;
-        if(note)
-        {
-            std::cout<<note<<" added "<<where<<std::endl;
-        }
         return true;
     }
-    bool addMove(int col, int row, cellType who, const char* note = nullptr)
+    bool addMove(int col, int row, cellType who)
     {
         if(_board[col][row]) //not empty
             throw "bad move";
         _board[col][row]=who;
-        if(note)
-        {
-            std::cout<<note<<" added "<<col<<' '<<row<<std::endl;
-        }
         return true;
     }
-    bool removeMove(Move where, const char* note = nullptr)
+    bool removeMove(Move where)
     {
         int col = where.getCol();
         int row = where.getRow();
         if(_board[col][row] <= cellType::BOUNDRY) //not empty
             throw "bad move";
         _board[col][row]=cellType::EMPTY;
-        if(note)
-        {
-            std::cout<<note<<" removed "<<where<<std::endl;
-        }
         return true;
     }
     const std::array<Cell,16>& operator[](int col)const
