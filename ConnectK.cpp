@@ -16,14 +16,14 @@
 int main() {
     Move last_move(-1,-1);
     AIShell* AI[2];
-    AI[0] = new AIShell("p0");
+    AI[0] = new AIWIP("p0");
     AI[1] = new AIWIP("p1");
     int which = 1;
     std::cout<<"Player #"<<" moved: (col row):"<<std::endl;
-    AI[0]->setBoard(false,6,6,4,last_move);
+    AI[0]->setBoard(false,3,3,3,last_move);
     last_move = AI[0]->makeMove(2000);
     std::cout<<0<<" moved: "<<last_move<<std::endl;
-    AI[1]->setBoard(false,6,6,4,last_move);
+    AI[1]->setBoard(false,3,3,3,last_move);
     
     
     for(int i = 0; i<255;++i){
@@ -33,8 +33,6 @@ int main() {
             break;
         which^=1;
         AI[which]->enemyMove(last_move);
-        if(AI[which]->isGameover())
-            break;
     }
     
 

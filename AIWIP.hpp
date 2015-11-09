@@ -64,9 +64,11 @@ protected:
             (*walker)->value = val;
             if (our_turn)
             {
-                if (val > alpha)
+                if(val > alpha)
+                    alpha = val;
+                if(val > best)
                 {
-                    best = alpha = val;
+                    best = val;
                     moveToFront(root, walker);
                 }
                 else
@@ -74,10 +76,12 @@ protected:
             }
             else
             {
-                if (val < beta)
+                if(val>beta)
+                    beta = val;
+                if (val < best)
                 {
                     moveToFront(root, walker);
-                    best = beta = val;
+                    best = val;
                 }
                 else
                     walker = &(*walker)->next;
@@ -95,16 +99,16 @@ protected:
             if(_root)
             {
                 _move = _root->my_move;
-                D(std::cout << _name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
+                D(std::cout << name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
             }
             else
             {
-                D(std::cout << _name << ": Game is over!"<<std::endl;)
+                D(std::cout << name << ": Game is over!"<<std::endl;)
             }
         }
-        catch (...)
+        catch (int code)
         {
-            D(std::cout << _name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
+            D(std::cout << name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }
 
 
@@ -139,6 +143,7 @@ protected:
     }
     virtual void _cleanTree()
     {
+        /* bugs in here - need to prune the move from within the tree too!
         if (!_root)
             return;
         GameNode* walker = _root;
@@ -153,6 +158,9 @@ protected:
 
         delete _root;
         _root = hold;
+         */
+        delete _root;
+        _root = nullptr;
     }
     GameNode *_root;
 

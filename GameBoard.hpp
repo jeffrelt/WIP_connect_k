@@ -73,14 +73,14 @@ public:
         int col = where.getCol();
         int row = where.getRow();
         if(_board[col][row]) //not empty
-            return false;
+            throw "bad move";
         _board[col][row]=who;
         return true;
     }
     bool addMove(int col, int row, cellType who)
     {
         if(_board[col][row]) //not empty
-            return false;
+            throw "bad move";
         _board[col][row]=who;
         return true;
     }
@@ -89,7 +89,7 @@ public:
         int col = where.getCol();
         int row = where.getRow();
         if(_board[col][row] <= cellType::BOUNDRY) //not empty
-            return false;
+            throw "bad move";
         _board[col][row]=cellType::EMPTY;
         return true;
     }

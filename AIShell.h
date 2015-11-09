@@ -9,7 +9,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-//#define DEBUG_ON
+#define DEBUG_ON
 
 #ifdef DEBUG_ON
 #define D(x) x
@@ -48,7 +48,7 @@ public:
         _game.setBoard(num_col,num_row);
         if(last_move.getCol() != -1)
         {
-            D(std::cout<<_name<<": Enemy moved "<<last_move<<std::endl;)
+            D(std::cout<<name<<": Enemy moved "<<last_move<<std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
         }
         _boardPopulated();
@@ -117,12 +117,12 @@ protected:
                 if(_move_count & 1)
                 {
                     _game.addMove(m, cellType::US);
-                    D(std::cout<<_name<<": I moved "<<m<<std::endl;)
+                    D(std::cout<<name<<": I moved "<<m<<std::endl;)
                 }
                 else
                 {
                     _game.addMove(m, cellType::ENEMY);
-                    D(std::cout<<_name<<": Enemy moved "<<m<<std::endl;)
+                    D(std::cout<<name<<": Enemy moved "<<m<<std::endl;)
                 }
                 _cleanTree();
                 _run = true;
