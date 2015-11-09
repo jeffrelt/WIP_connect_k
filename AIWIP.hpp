@@ -19,12 +19,31 @@ public:
     AIWIP(const char* name) : AIShell(name)
     {}
 protected:
-
+    virtual GameNode* getPossibleMoves(const GameBoard& board, bool best_only = false)
+    {
+        GameNode* root = nullptr;
+        GameNode* hold;
+        for (int col = 0; col<_num_col; col++){
+            for (int row = _num_row-1; row>=0; row--){
+                if (board[col][row] == cellType::EMPTY){
+                    hold = root;
+                    // NOTE: here we create a GameNode - this will change later
+                    // it is the callers responsibility to delete it
+                    root = new GameNode;
+                    root->my_move=Move(col,row);
+                    root->next=hold;
+                    if(_gravity)
+                        break;
+                }
+            }
+        }
+        return root;
+    }
     virtual void _boardPopulated()
     {
         buildScoring();
     }
-    void moveToFront(GameNode** old_head, GameNode** new_head)
+    virtual void moveToFront(GameNode** old_head, GameNode** new_head)
     {
         if (old_head == new_head)
             return;
@@ -33,7 +52,7 @@ protected:
         hold->next = *old_head;
         *old_head = hold;
     }
-    int8_t ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
+    virtual int8_t ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
     {
         int best;
         GameNode** walker = root;
@@ -42,7 +61,7 @@ protected:
         bool our_turn = !(turn & 1);
         int val;
         if (!*root)
-            *root = board.getPossibleMoves(_num_col, _num_row);
+            *root = getPossibleMoves(board);
         if (!*root)
             return val = eval(board, !our_turn);
 

@@ -97,24 +97,6 @@ public:
     {
         return _board[col];
     }
-    GameNode* getPossibleMoves(int num_col, int num_row, bool best_only = false)
-    {
-        GameNode* root = nullptr;
-        GameNode* hold;
-        for (int col = 0; col<num_col; col++){
-            for (int row = 0; row<num_row; row++){
-                if (_board[col][row] == cellType::EMPTY){
-                    hold = root;
-                    // NOTE: here we create a GameNode - this will change later
-                    // it is the callers responsibility to delete it
-                    root = new GameNode;
-                    root->my_move=Move(col,row);
-                    root->next=hold;
-                }
-            }
-        }
-        return root;
-    }
 
 private:
     std::array<std::array<Cell,16>,16> _board;
