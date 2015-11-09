@@ -12,9 +12,10 @@
 #define DEBUG_ON
 
 #ifdef DEBUG_ON
-#define D(x) x
+    #define SINGLE_THREAD
+    #define D(x) x
 #else
-#define D(x)
+    #define D(x)
 #endif
 
 
@@ -51,37 +52,36 @@ public:
             D(std::cout << name << ": Enemy moved " << last_move << std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
         }
-        D(std::cout << name << ": pre_pop" << std::endl;)
         _boardPopulated();
-        D(std::cout << name << ": post_pop" << std::endl;)
-        //_builder = new std::thread(&AIShell::_buildGameTree,this);
+#ifndef SINGLE_THREAD
+        _builder = new std::thread(&AIShell::_buildGameTree,this);
+#endif
     }
     void enemyMove(Move their_move)
     {
-        D(std::cout << name << ": pre_enemy" << std::endl;)
-        //_run = false;
+#ifdef SINGLE_THREAD
+        _game.addMove(their_move, cellType::ENEMY);
+#else
         _move = their_move;
         _move_count++;
-        _game.addMove(_move, cellType::ENEMY);
-        _cleanTree();
-        D(std::cout << name << ": post_enemy" << std::endl;)
+        _run = false;
+#endif
     }
     Move makeMove(int deadline)
     {
-        D(std::cout << name << ": pre_move" << std::endl;)
-        //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+#ifdef SINGLE_THREAD
         _cleanTree();
-        D(std::cout << name << ": pre_move" << std::endl;)
-        for (int i = 1; i <= 3; ++i)
+        for(int i = 1; i<=4; i++)
         {
-            D(std::cout << name << ": pre_logic level"<<i << std::endl;)
+            D(std::cout << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
         }
-        //_run = false;
-        _move_count++;
-        D(std::cout << name << ": pre_add_move" << std::endl;)
         _game.addMove(_move, cellType::US);
-        D(std::cout << name << ": post_add_move" << std::endl;)
+#else
+        std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        _run = false;
+        _move_count++;
+#endif
         return Move(_move);
     }
     int isGameover()

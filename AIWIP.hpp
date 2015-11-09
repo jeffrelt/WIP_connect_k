@@ -137,6 +137,7 @@ protected:
             if (_root)
             {
                 _move = _root->my_move;
+                D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
                 /*
                 _game.addMove(_root->my_move,cellType::US);
                 std::cout << "*************************" << std::endl;
@@ -149,7 +150,7 @@ protected:
                 }
                 std::cout << "*************************" << std::endl;
                 _game.removeMove(_root->my_move);*/
-                D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
+                
             }
             else
             {
@@ -234,12 +235,50 @@ protected:
     //heuristic stuff:
     
     class EvalObject{
-        EvalObject(int k) : _k(k), _last(cellType::BOUNDRY)
+    public:
+        EvalObject(int k) : _k(k), _last(cellType::BOUNDRY), _score(0), _count(0), _gameover(false), _last_player(cellType::BOUNDRY), _player_count(0), _player_possilble(0)
+        {}
+        void operator() (const cellType cell)
         {
-    }
-        
+            if(cell == _last)
+                ++_count;
+            else
+                _check(cell);
+        }
+        void endl()
+        {
+            _check(cellType::BOUNDRY);
+        }
+        operator int()
+        {
+            return _score;
+        }
+    private:
+        void _check(cellType cell)
+        {
+            if (_gameover)
+                return;
+            
+            if(_count >= _k){
+                _gameover = true;
+                if(_last == cellType::US)
+                    _score = INT_MAX;
+                else if(_last == cellType::ENEMY)
+                    _score = INT_MIN;
+            }
+            // logic needed
+        }
+        bool _gameover;
         int _k;
+        int _score;
+        int _count;
         cellType _last;
+        cellType _last_player;
+        int _player_count;
+        int _player_possilble;
+    
+    
+        
     };
 
     int eval2(const GameBoard& board, bool our_turn)
