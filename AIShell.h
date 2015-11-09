@@ -72,7 +72,7 @@ public:
         //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
         _cleanTree();
         D(std::cout << name << ": pre_move" << std::endl;)
-        for (int i = 1; i <= 4; ++i)
+        for (int i = 1; i <= 3; ++i)
         {
             D(std::cout << name << ": pre_logic level"<<i << std::endl;)
             _logic(i);

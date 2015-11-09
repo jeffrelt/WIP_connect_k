@@ -41,7 +41,7 @@ protected:
     }
     virtual void _boardPopulated()
     {
-        buildScoring();
+        //buildScoring();
     }
     virtual void moveToFront(GameNode** old_head, GameNode** new_head)
     {
@@ -78,7 +78,7 @@ protected:
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval(board, our_turn);
+                val = eval(board, our_turn, (*walker)->my_move);
             board.removeMove((*walker)->my_move);
             (*walker)->value = val;
             if (our_turn)
@@ -212,7 +212,32 @@ protected:
      */
 
     //heuristic stuff:
+    
+    class EvalObject{
+        EvalObject(int k) : _k(k), _last(cellType::BOUNDRY)
+        {}
+        
+        int _k;
+        cellType _last;
+    };
 
+    int eval2(const GameBoard& board, bool our_turn)
+    {
+        int score = 0;
+        for(int i = 0; i<_num_col; ++i)
+        {
+            cellType last = cellType::BOUNDRY;
+            for(int j = 0; j<_num_row; ++j)
+            {
+                
+            }
+        }
+        
+        
+        return 0;
+    }
+    
+    
     int *_row; //socring for thw row
     int *_column;  //socring for the column
     int **_diagonal;
@@ -336,7 +361,7 @@ protected:
 
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
-    int eval(const GameBoard & board, bool our_turn)    {
+    int eval(const GameBoard & board, bool our_turn, Move what_move)    {
         
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
@@ -355,8 +380,8 @@ protected:
         }
         int score = AIscore - HMscore + 100 * goalTest(board);
 
-        /*std::cout << "score: " <<  score << std::endl;
-        std::cout << "AIscore: " <<  AIscore << std::endl;
+        D(std::cout << "Move: "<<what_move<<" score: " <<  score << std::endl;)
+        /*std::cout << "AIscore: " <<  AIscore << std::endl;
         std::cout << "HMscore: " << HMscore << std::endl;
         std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
         return score;
