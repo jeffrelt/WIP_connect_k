@@ -83,9 +83,9 @@ protected:
             (*walker)->value = val;
             if (our_turn)
             {
-                if(val > alpha)
+                if (val > alpha)
                     alpha = val;
-                if(val > best)
+                if (val > best)
                 {
                     best = val;
                     moveToFront(root, walker);
@@ -95,7 +95,7 @@ protected:
             }
             else
             {
-                if(val>beta)
+                if (val > beta)
                     beta = val;
                 if (val < best)
                 {
@@ -115,14 +115,26 @@ protected:
     {
         try {
             int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
-            if(_root)
+            if (_root)
             {
                 _move = _root->my_move;
-                D(std::cout << name << ": best move at depth " << target_depth << " is "<< _move<< " with a score of "<<best<<std::endl;)
+                /*
+                _game.addMove(_root->my_move,cellType::US);
+                std::cout << "*************************" << std::endl;
+                for (int i = 0; i < _num_row; i++) {
+                   //column
+                   for (int j = 0; j < _num_col ; j++) {
+                       std::cout << _game[j][i];
+                   }
+                   std::cout << std::endl;
+                }
+                std::cout << "*************************" << std::endl;
+                _game.removeMove(_root->my_move);*/
+                D(std::cout << name << ": best move at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
             }
             else
             {
-                D(std::cout << name << ": Game is over!"<<std::endl;)
+                D(std::cout << name << ": Game is over!" << std::endl;)
             }
         }
         catch (int code)
@@ -318,16 +330,7 @@ protected:
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard & board, bool our_turn)    {
-        /*
-        std::cout << "*************************" << std::endl;
-        for (int i = 0; i < _num_row; i++) {
-            //column
-            for (int j = 0; j < _num_col ; j++) {
-                std::cout << board[j][i];
-            }
-            std::cout << std::endl;
-        }
-        std::cout << "*************************" << std::endl;*/
+
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;
@@ -343,9 +346,9 @@ protected:
                 }
             }
         }
+        int score = AIscore - HMscore + 100 * goalTest(board);
 
-        int score = AIscore - HMscore + 100 * goalTest(board);/*
-        std::cout << "score: " <<  score << std::endl;
+        /*std::cout << "score: " <<  score << std::endl;
         std::cout << "AIscore: " <<  AIscore << std::endl;
         std::cout << "HMscore: " << HMscore << std::endl;
         std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
