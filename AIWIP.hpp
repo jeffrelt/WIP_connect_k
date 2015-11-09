@@ -43,14 +43,16 @@ protected:
     {
         buildScoring();
     }
-    virtual void moveToFront(GameNode** old_head, GameNode** new_head)
+    virtual bool moveToFront(GameNode** old_head, GameNode** new_head)
     {
         if (old_head == new_head)
-            return;
+            return true;
         GameNode* hold = *new_head;
         *new_head = hold->next;
         hold->next = *old_head;
         *old_head = hold;
+        D(std::cout << name<<": Moving last to head of list" << std::endl;)
+        return false;
     }
     virtual int8_t ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
     {
@@ -86,11 +88,16 @@ protected:
             if (our_turn)
             {
                 if (val > alpha)
+                {
+                    D(std::cout << name<<": new alpha: "<<val<<" old:"<<alpha << std::endl;)
                     alpha = val;
+                }
                 if (val > best)
                 {
+                    D(std::cout << name<<": new best: "<<val<<" old:"<<best << std::endl;)
                     best = val;
-                    moveToFront(root, walker);
+                    if(moveToFront(root, walker))
+                        walker = &(*walker)->next;
                 }
                 else
                     walker = &(*walker)->next;
@@ -98,25 +105,34 @@ protected:
             else
             {
                 if (val > beta)
+                {
+                    D(std::cout << name<<": new beta: "<<val<<" old:"<<beta << std::endl;)
                     beta = val;
+                }
                 if (val < best)
                 {
-                    moveToFront(root, walker);
+                    D(std::cout << name<<": new best: "<<val<<" old:"<<best << std::endl;)
+                    if(moveToFront(root, walker))
+                        walker = &(*walker)->next;
                     best = val;
                 }
                 else
                     walker = &(*walker)->next;
             }
             if (alpha >= beta)
+            {
                 return best;
+                D(std::cout << name<<": trimming branch. returning "<<best <<" from depth "<<search_depth-remaining_depth<< std::endl;)
+            }
 
         }
+        D(std::cout << name<<": returning "<<best<<" from depth "<<search_depth-remaining_depth << std::endl;)
         return best;
     }
     virtual void _logic(int target_depth)
     {
         try {
-            search_depth = target_depth;
+            search_depth = target_depth+1;
             int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             if (_root)
             {
@@ -133,7 +149,7 @@ protected:
                 }
                 std::cout << "*************************" << std::endl;
                 _game.removeMove(_root->my_move);*/
-                D(std::cout << name << ": best move at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
+                D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
             }
             else
             {
