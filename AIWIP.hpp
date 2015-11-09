@@ -14,9 +14,9 @@
 
 class AIWIP: public AIShell {
 public:
-    AIWIP()
+    AIWIP() : _root(nullptr)
     {}
-    AIWIP(const char* name) : AIShell(name)
+    AIWIP(const char* name) : AIShell(name), _root(nullptr)
     {}
 protected:
     virtual GameNode* getPossibleMoves(const GameBoard& board, bool best_only = false)
@@ -190,8 +190,11 @@ protected:
         delete _root;
         _root = hold;
          */
-        delete _root;
-        _root = nullptr;
+        if(_root)
+        {
+            delete _root;
+            _root = nullptr;
+        }
     }
     GameNode *_root;
 
@@ -219,6 +222,7 @@ protected:
 
     //this only need to be called once per game
     void buildScoring() {
+        
         _row = new int [_num_col] ();
         _column = new int [_num_row]();
         _diagonal = new int*[_num_col];
@@ -231,16 +235,18 @@ protected:
         for (int i = 0; i < _num_col; i++) {
             _diagonal[i] = new int[_num_row]();
         }
-
+        D(std::cout << name << ": after_new" << std::endl;)
 
         int col_number = calculateMax(_num_col);
         int row_number = calculateMax(_num_row);
         int temp = 0;
+        D(std::cout << name << ": after calc_max" << std::endl;)
         buildHelper(_column, col_number, _num_col);
         buildHelper(_row, row_number, _num_row);
+        D(std::cout << name << ": after build_helpers" << std::endl;)
         diagHelper();
 
-
+        D(std::cout << name << ": post_helper" << std::endl;)
         D(std::cout << "row: " << std::endl;)
         for (int i = 0; i < _num_row; i++) {
             D(std::cout << _row[i];)
@@ -272,6 +278,7 @@ protected:
             temp[i][i] = temp[i][i] + 1;
             temp[i][_k - i - 1] = temp[i][_k - i - 1] + 1 ;
         }
+        D(std::cout << name << ": before diagApply" << std::endl;)
         diagApply(temp);
 
     }
@@ -330,7 +337,7 @@ protected:
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard & board, bool our_turn)    {
-
+        
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;

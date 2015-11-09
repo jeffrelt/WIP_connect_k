@@ -51,26 +51,37 @@ public:
             D(std::cout << name << ": Enemy moved " << last_move << std::endl;)
             _game.addMove(last_move, cellType::ENEMY);
         }
+        D(std::cout << name << ": pre_pop" << std::endl;)
         _boardPopulated();
+        D(std::cout << name << ": post_pop" << std::endl;)
         //_builder = new std::thread(&AIShell::_buildGameTree,this);
     }
     void enemyMove(Move their_move)
     {
+        D(std::cout << name << ": pre_enemy" << std::endl;)
         //_run = false;
         _move = their_move;
         _move_count++;
         _game.addMove(_move, cellType::ENEMY);
         _cleanTree();
+        D(std::cout << name << ": post_enemy" << std::endl;)
     }
     Move makeMove(int deadline)
     {
+        D(std::cout << name << ": pre_move" << std::endl;)
         //std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
         _cleanTree();
+        D(std::cout << name << ": pre_move" << std::endl;)
         for (int i = 1; i <= 4; ++i)
+        {
+            D(std::cout << name << ": pre_logic level"<<i << std::endl;)
             _logic(i);
+        }
         //_run = false;
         _move_count++;
+        D(std::cout << name << ": pre_add_move" << std::endl;)
         _game.addMove(_move, cellType::US);
+        D(std::cout << name << ": post_add_move" << std::endl;)
         return Move(_move);
     }
     int isGameover()
