@@ -54,7 +54,7 @@ protected:
         D(std::cout << name<<": Moving last to head of list" << std::endl;)
         return false;
     }
-    virtual int8_t ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
+    virtual int ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
     {
         int best;
         GameNode** walker = root;
