@@ -47,7 +47,7 @@ public:
         if (last_move.getCol() != -1)
         {
             D(std::cout << name << ": Enemy moved " << last_move << std::endl;)
-            _game.addMove(last_move, cellType::ENEMY);
+            _game.addMove(last_move, ENEMY);
         }
         _boardPopulated();
 #ifndef SINGLE_THREAD
@@ -57,7 +57,7 @@ public:
     void enemyMove(Move their_move)
     {
 #ifdef SINGLE_THREAD
-        _game.addMove(their_move, cellType::ENEMY);
+        _game.addMove(their_move, ENEMY);
 #else
         _move = their_move;
         _move_count++;
@@ -73,7 +73,7 @@ public:
             D(std::cout << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
         }
-        _game.addMove(_move, cellType::US);
+        _game.addMove(_move, US);
 #else
         std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
         _run = false;
@@ -97,7 +97,7 @@ protected:
         {
             for (int col = 0; col < _num_col; col++)
                 for (int row = 0; row < _num_row; row++)
-                    if (_game[col][row] == cellType::EMPTY)
+                    if (_game[col][row] == EMPTY)
                     {
                         _move = Move(col, row);
                         return;
@@ -126,12 +126,12 @@ protected:
                 depth = 1;
                 if (_move_count & 1)
                 {
-                    _game.addMove(m, cellType::US);
+                    _game.addMove(m, US);
                     D(std::cout << name << ": I moved " << m << std::endl;)
                 }
                 else
                 {
-                    _game.addMove(m, cellType::ENEMY);
+                    _game.addMove(m, ENEMY);
                     D(std::cout << name << ": Enemy moved " << m << std::endl;)
                 }
                 _cleanTree();
@@ -151,19 +151,19 @@ protected:
             //row
             for (int j = 0; j < _num_row; j++) {
 
-                if (board[i][j] == cellType::US)
+                if (board[i][j] == US)
                 {
                     if (vscore < 0)
                         vscore = 0;
                     vscore++;
                 }
-                else if (board[i][j] == cellType::ENEMY)
+                else if (board[i][j] == ENEMY)
                 {
                     if (vscore > 0)
                         vscore = 0;
                     vscore--;
                 }
-                else if (board[i][j] == cellType::EMPTY)
+                else if (board[i][j] == EMPTY)
                 {
                     vscore = 0;
                 }
@@ -179,19 +179,19 @@ protected:
             //column
             for (int j = 0; j < _num_col ; j++) {
 
-                if (board[j][i] == cellType::US)
+                if (board[j][i] == US)
                 {
                     if (hscore < 0)
                         hscore = 0;
                     hscore++;
                 }
-                else if (board[j][i] == cellType::ENEMY)
+                else if (board[j][i] == ENEMY)
                 {
                     if (hscore > 0)
                         hscore = 0;
                     hscore--;
                 }
-                else if (board[j][i] == cellType::EMPTY)
+                else if (board[j][i] == EMPTY)
                 {
                     hscore = 0;
                 }
@@ -206,19 +206,19 @@ protected:
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
             for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
                 for (int i = 0; i < _k; i++) {
-                    if (board[boardCol + i][boardRow + i]  == cellType::US)
+                    if (board[boardCol + i][boardRow + i]  == US)
                     {
                         if (d1score < 0)
                             d1score = 0;
                         d1score++;
                     }
-                    else if (board[boardCol + i][boardRow + i] == cellType::ENEMY)
+                    else if (board[boardCol + i][boardRow + i] == ENEMY)
                     {
                         if (d1score > 0)
                             d1score = 0;
                         d1score--;
                     }
-                    else if (board[boardCol + i][boardRow + i] == cellType::EMPTY)
+                    else if (board[boardCol + i][boardRow + i] == EMPTY)
                     {
                         d1score = 0;
                     }
@@ -227,19 +227,19 @@ protected:
                     }
 
 
-                    if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::US)
+                    if (board[boardCol + i][boardRow + (_k - i - 1)] == US)
                     {
                         if (d2score < 0)
                             d2score = 0;
                         d2score++;
                     }
-                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::ENEMY)
+                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == ENEMY)
                     {
                         if (d2score > 0)
                             d2score = 0;
                         d2score--;
                     }
-                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == cellType::EMPTY)
+                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == EMPTY)
                     {
                         d2score = 0;
                     }

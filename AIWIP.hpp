@@ -25,7 +25,7 @@ protected:
         GameNode* hold;
         for (int col = 0; col < _num_col; col++) {
             for (int row = _num_row - 1; row >= 0; row--) {
-                if (board[col][row] == cellType::EMPTY) {
+                if (board[col][row] == EMPTY) {
                     hold = root;
                     // NOTE: here we create a GameNode - this will change later
                     // it is the callers responsibility to delete it
@@ -81,7 +81,7 @@ protected:
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval3(board, our_turn);
+                val = eval3(board, _k);
             board.removeMove((*walker)->my_move);
             D(std::cout << name << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             (*walker)->value = val;
@@ -139,7 +139,7 @@ protected:
                 _move = _root->my_move;
                 D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
                 /*
-                _game.addMove(_root->my_move,cellType::US);
+                _game.addMove(_root->my_move,US);
                 std::cout << "*************************" << std::endl;
                 for (int i = 0; i < _num_row; i++) {
                    //column
@@ -178,7 +178,7 @@ protected:
                     grader->value=eval(_tree_game, turn&1);
                     _tree_game.removeMove(grader->my_move);
                     grader=grader->getNext();
-                    if(turn==cellType::US)
+                    if(turn==US)
                     {
                         // Alpha/beta pruning goes here
 
@@ -240,7 +240,7 @@ protected:
         int score = 0;
         for (int i = 0; i < _num_col; ++i)
         {
-            cellType last = cellType::BOUNDRY;
+            cellType last = BOUNDRY;
             for (int j = 0; j < _num_row; ++j)
             {
 
@@ -308,7 +308,7 @@ protected:
     int *_row; //socring for thw row
     int *_column;  //socring for the column
     int **_diagonal;
-    int calculateMax(uint8_t number)   {
+    int calculateMax(int number)   {
         return (number - _k + 1);
     }
 
@@ -437,10 +437,10 @@ protected:
         for (int i = 0; i < _num_col; i++) {
             //j is row
             for (int j = 0; j < _num_row ; j++) {
-                if (board[i][j] == cellType::US) {
+                if (board[i][j] == US) {
                     AIscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
                 }
-                else if (board[i][j] == cellType::ENEMY) {
+                else if (board[i][j] == ENEMY) {
                     HMscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
                 }
             }

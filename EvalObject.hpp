@@ -47,9 +47,9 @@ private:
         int AIcount = 0;
         int HMcount = 0;
         for (int i = 0 ; i < _k; i++) {
-            if (arrary[i] == cellType::US)
+            if (arrary[i] == US)
                 AIcount++;
-            else if ( arrary[i] == cellType::ENEMY)
+            else if ( arrary[i] == ENEMY)
                 HMcount++;
         }
         if (AIcount && HMcount)
