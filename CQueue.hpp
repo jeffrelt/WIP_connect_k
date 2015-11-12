@@ -22,7 +22,7 @@ public:
         cellType data;
         if(front == -1)
         {
-            return cellType::BOUNDRY;
+            return BOUNDRY;
         }
         data = queue[front];
         if(front == rear)

@@ -13,11 +13,13 @@
 #include "Move.h"
 #include "GameNode.hpp"
 
+
 enum cellType{ EMPTY=0, BOUNDRY=1, US=2, ENEMY=3 };
 
 
 
 struct Cell{
+    
     const Cell operator = (const cellType who)
     {
         _cell = who;
@@ -40,9 +42,9 @@ struct Cell{
     friend
     std::ostream& operator << (std::ostream& out, const Cell& cell)
     {
-        if( cell == cellType::EMPTY)
+        if( cell == EMPTY)
             out<<' ';
-        else if( cell == cellType::US)
+        else if( cell == US)
             out<<'X';
         else
             out<<'O';
@@ -61,7 +63,7 @@ public:
         //set the boundies when less than 16x16
         for(int i = 0; i<col; ++i)
             for(int j = 0; j<row; ++j)
-                _board[i][j]=cellType::EMPTY;
+                _board[i][j]=EMPTY;
     }
     bool addMove(Move where, cellType who)
     {
@@ -83,9 +85,9 @@ public:
     {
         int col = where.getCol();
         int row = where.getRow();
-        if(_board[col][row] <= cellType::BOUNDRY) //not empty
+        if(_board[col][row] <= BOUNDRY) //not empty
             throw "bad move";
-        _board[col][row]=cellType::EMPTY;
+        _board[col][row]= EMPTY;
         return true;
     }
     const Cell* operator[](int col)const
