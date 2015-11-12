@@ -68,7 +68,7 @@ public:
     {
 #ifdef SINGLE_THREAD
         _cleanTree();
-        for(int i = 1; i<=4; i++)
+        for(int i = 1; i<=1; i++)
         {
             D(std::cout << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);

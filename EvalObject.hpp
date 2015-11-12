@@ -19,21 +19,39 @@ public:
         _k = k;
         _score = 0;
         queue = new CQueue(k);
+        AIcount = 0;
+        HMcount = 0;
+        Empty = 0 ;
     }
     void operator() (const cellType cell)
     {
-        bool temp = queue->push(cell);
-        if (!temp) {
-            _score += _check(queue->get());
-            queue->pop();
+        if (cell == US)
+            AIcount++;
+        else if (cell == ENEMY)
+            HMcount++;
+        else if (cell == EMPTY)
+            Empty++;
+
+        if (!queue->push(cell)) {
+            _score += _check();
+            cellType temp = queue->pop();
+            if (temp == US)
+                AIcount--;
+            else if (temp == ENEMY)
+                HMcount--;
+            else if (temp == EMPTY)
+                Empty--;
             if (!queue->push(cell))
                 std::cout << "!!!!!something is wrong!!!!!" << std::endl;
         }
     }
     void endl()
     {
-        _score += _check(queue->get());
+        _score += _check();
         queue->reset();
+        AIcount = 0;
+        HMcount = 0;
+        Empty = 0;
     }
     operator int()
     {
@@ -44,20 +62,12 @@ public:
         return _gameover;
     }
 private:
-    int _check(Cell * arrary)
+    int _check()
     {
-        int AIcount = 0;
-        int HMcount = 0;
-        for (int i = 0 ; i < _k; i++) {
-            if (arrary[i] == US)
-                AIcount++;
-            else if ( arrary[i] == ENEMY)
-                HMcount++;
-        }
-/*
-        std::cout << "AI: " << AIcount << std::endl;
-        std::cout << "HM: " << HMcount << std::endl;
-*/
+
+        D(std::cout << "AI: " << AIcount << std::endl;)
+        D(std::cout << "HM: " << HMcount << std::endl;)
+
         //both greater than 0
         if (AIcount && HMcount)
             return 0;
@@ -67,10 +77,10 @@ private:
             if (AIcount == _k)
             {
                 _gameover = true;
-                return 1000;
+                return 5000;
             }
             else
-                return 10 * AIcount;
+                return 30 * AIcount  - 4 * Empty;
         }
         else if (HMcount && !AIcount)
         {
@@ -78,10 +88,10 @@ private:
             if (HMcount == _k)
             {
                 _gameover = true;
-                return -1000;
+                return -5000;
             }
             else
-                return -10 * HMcount;
+                return -30 * HMcount + 4 * Empty;
         }
         else {
             //both 0
@@ -92,6 +102,9 @@ private:
     bool _gameover;
     int _k;
     int _score;
+    int AIcount;
+    int HMcount;
+    int Empty;
     CQueue *queue;
 };
 

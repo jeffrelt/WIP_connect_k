@@ -77,13 +77,13 @@ protected:
             if (!_run)
                 throw 1;
             board.addMove((*walker)->my_move, turn);
-            D(std::cout << name << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
+            D(std::cout << turn << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
                 val = eval3(board, _k);
             board.removeMove((*walker)->my_move);
-            D(std::cout << name << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
+            D(std::cout << turn << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             (*walker)->value = val;
             if (our_turn)
             {
@@ -259,6 +259,7 @@ protected:
         EvalObject d1eval (k);
         EvalObject d2eval (k);
 
+        D(std::cout << "roweval" << std::endl;)
         for (int i = 0; i < _num_row; i++ )
         {
             for (int j = 0; j < _num_col; j++)
@@ -271,17 +272,19 @@ protected:
         }
 
 
+        D(std::cout << "coleval" << std::endl;)
         for (int i = 0; i < _num_col; i++ )
         {
             for (int j = 0; j < _num_row; j++)
             {
-                coleval(board[j][i]);
+                coleval(board[i][j]);
             }
             coleval.endl();
             if (coleval.gameOver())
                 return int(coleval) > 0 ? INT_MAX : INT_MIN;
         }
-
+        
+        D(std::cout << "deval" << std::endl;)
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
             for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
                 for (int i = 0; i < _k; i++) {
@@ -297,9 +300,14 @@ protected:
             }
         }
 
-        int score = int(coleval) + int(roweval) + 5 * int(d1eval) + 5 * int(d2eval);
+        int score = int(coleval) + int(roweval) + int(d1eval) + int(d2eval);
 
-        std::cout << "score: " << score << std::endl;
+        D(std::cout << "score: " << score << std::endl;)
+        D(std::cout << "coleval: " << int(coleval) << std::endl;)
+        D(std::cout << "roweval: " << int(roweval) << std::endl;)
+        D(std::cout << "d1eval: " << int(d1eval) << std::endl;)
+        D(std::cout << "d2eval: " << int(d2eval) << std::endl;)
+
         return score;
 
     }
