@@ -137,7 +137,9 @@ protected:
             if (_root)
             {
                 _move = _root->my_move;
+
                 D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
+                D(std::cout << "*****************************************************************************************" << std::endl;)
                 /*
                 _game.addMove(_root->my_move,US);
                 std::cout << "*************************" << std::endl;
@@ -234,7 +236,7 @@ protected:
 
     //heuristic stuff:
 
-    
+
     int eval2(const GameBoard& board, bool our_turn)
     {
         int score = 0;
@@ -253,7 +255,7 @@ protected:
 
     int eval3(GameBoard& board, int k)
     {
-        
+
         EvalObject coleval (k);
         EvalObject roweval (k);
         EvalObject d1eval (k);
@@ -283,7 +285,7 @@ protected:
             if (coleval.gameOver())
                 return int(coleval) > 0 ? INT_MAX : INT_MIN;
         }
-        
+
         D(std::cout << "deval" << std::endl;)
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
             for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {

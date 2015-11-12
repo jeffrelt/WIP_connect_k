@@ -25,12 +25,7 @@ public:
     }
     void operator() (const cellType cell)
     {
-        if (cell == US)
-            AIcount++;
-        else if (cell == ENEMY)
-            HMcount++;
-        else if (cell == EMPTY)
-            Empty++;
+
 
         if (!queue->push(cell)) {
             _score += _check();
@@ -43,7 +38,24 @@ public:
                 Empty--;
             if (!queue->push(cell))
                 std::cout << "!!!!!something is wrong!!!!!" << std::endl;
+            else {
+                if (cell == US)
+                    AIcount++;
+                else if (cell == ENEMY)
+                    HMcount++;
+                else if (cell == EMPTY)
+                    Empty++;
+            }
         }
+        else {
+            if (cell == US)
+                AIcount++;
+            else if (cell == ENEMY)
+                HMcount++;
+            else if (cell == EMPTY)
+                Empty++;
+        }
+
     }
     void endl()
     {
@@ -65,8 +77,8 @@ private:
     int _check()
     {
 
-        D(std::cout << "AI: " << AIcount << std::endl;)
-        D(std::cout << "HM: " << HMcount << std::endl;)
+        //D(std::cout << "AI: " << AIcount << std::endl;)
+        //D(std::cout << "HM: " << HMcount << std::endl;)
 
         //both greater than 0
         if (AIcount && HMcount)
