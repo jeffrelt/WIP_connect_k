@@ -13,7 +13,7 @@
 
 
 struct GameNode {
-    GameNode() : child(nullptr), next(nullptr)
+    GameNode() : child(NULL), next(NULL)
     {}
     ~GameNode()
     {

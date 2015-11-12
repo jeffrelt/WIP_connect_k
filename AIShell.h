@@ -1,10 +1,7 @@
 #ifndef AISHELL_H
 #define AISHELL_H
 
-#include <chrono>
-#include <thread>
-#include <utility>
-#include <atomic>
+#include <pthread.h>
 #include <climits>
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
@@ -26,17 +23,17 @@ public:
     AIShell()
     {
         name = "WIP";
-        _builder = nullptr;
+        //_builder = NULL;
     }
     AIShell(const char* my_name)
     {
         name = my_name;
-        _builder = nullptr;
+        //_builder = NULL;
     }
     ~AIShell()
     {
-        if (_builder)
-            delete _builder;
+       // if (_builder)
+         //   delete _builder;
     }
     void setBoard(bool gravity, int num_col, int num_row, int k, Move last_move)
     {
@@ -107,7 +104,9 @@ protected:
                     }
         }
         else
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        {
+            //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
     virtual void _cleanTree()
     {
@@ -255,15 +254,15 @@ protected:
 
     }
 
-    std::thread* _builder;
+    //std::thread* _builder;
     bool _gravity;
     int _num_col;
     int _num_row;
     int _k;
     GameBoard _game;
     Move _move;
-    std::atomic<bool> _run;
-    std::atomic<int> _move_count;
+    bool _run;
+    int _move_count;
 };
 
 #endif //AISHELL_H

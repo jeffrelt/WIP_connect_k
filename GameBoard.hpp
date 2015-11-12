@@ -10,7 +10,6 @@
 #define GameBoard_hpp
 
 #include <stdio.h>
-#include <array>
 #include "Move.h"
 #include "GameNode.hpp"
 
@@ -93,13 +92,13 @@ public:
         _board[col][row]=cellType::EMPTY;
         return true;
     }
-    const std::array<Cell,16>& operator[](int col)const
+    const Cell* operator[](int col)const
     {
         return _board[col];
     }
 
 private:
-    std::array<std::array<Cell,16>,16> _board;
+    Cell _board[10][10];
 };
 
 #endif //GameBoard_hpp
