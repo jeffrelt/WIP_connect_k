@@ -23,7 +23,7 @@ struct Cell{
         _cell = who;
         return *this;
     }
-    operator const cellType()
+    operator const cellType()const
     {
         return (cellType)_cell;
     }
@@ -54,11 +54,7 @@ private:
 
 class GameBoard{
 public:
-    GameBoard operator = (GameBoard& other)
-    {
-        _board = other._board;
-        return *this;
-    }
+    
     void setBoard(int col, int row)
     {
         //Wipe the board

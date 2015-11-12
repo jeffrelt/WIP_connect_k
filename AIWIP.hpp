@@ -10,19 +10,18 @@
 #define AIWIP_hpp
 
 #include "AIShell.h"
-#include "CQueue.hpp"
-
+#include "EvalObject.hpp"
 
 class AIWIP: public AIShell {
 public:
-    AIWIP() : _root(nullptr)
+    AIWIP() : _root(NULL)
     {}
-    AIWIP(const char* name) : AIShell(name), _root(nullptr)
+    AIWIP(const char* name) : AIShell(name), _root(NULL)
     {}
 protected:
     virtual GameNode* getPossibleMoves(const GameBoard& board, bool best_only = false)
     {
-        GameNode* root = nullptr;
+        GameNode* root = NULL;
         GameNode* hold;
         for (int col = 0; col < _num_col; col++) {
             for (int row = _num_row - 1; row >= 0; row--) {
@@ -214,7 +213,7 @@ protected:
         if (_root)
         {
             delete _root;
-            _root = nullptr;
+            _root = NULL;
         }
     }
     GameNode *_root;
@@ -235,77 +234,7 @@ protected:
 
     //heuristic stuff:
 
-    class EvalObject {
-    public:
-        EvalObject(int k)
-        {
-            _gameover = false;
-            _k = k;
-            _score = 0;
-            queue = new CQueue(k);
-        }
-        void operator() (const cellType cell)
-        {
-            if (!queue->push(cell)) {
-                _score += _check(queue->get());
-                queue->pop();
-                if (!queue->push(cell))
-                    std::cout << "!!!!!something is wrong!!!!!" << std::endl;
-            }
-        }
-        void endl()
-        {
-            queue->reset();
-        }
-        operator int()
-        {
-            return _score;
-        }
-        bool gameOver()
-        {
-            return _gameover;
-        }
-    private:
-        int _check(cellType * arrary)
-        {
-            int AIcount = 0;
-            int HMcount = 0;
-            for (int i = 0 ; i < _k; i++) {
-                if (arrary[i] == cellType::US)
-                    AIcount++;
-                else if ( arrary[i] == cellType::ENEMY)
-                    HMcount++;
-            }
-            if (AIcount && HMcount)
-                return 0;
-            else if (AIcount && !HMcount)
-            {
-                if (AIcount == _k)
-                {
-                    _gameover = true;
-                    return 1000;
-                }
-                else
-                    return 10 * AIcount;
-            }
-            else if (HMcount && !AIcount)
-            {
-                if (HMcount == _k)
-                {
-                    _gameover = true;
-                    return -1000;
-                }
-                else
-                    return -10 * HMcount;
-            }
-        }
-
-        bool _gameover;
-        int _k;
-        int _score;
-        CQueue *queue;
-    };
-
+    
     int eval2(const GameBoard& board, bool our_turn)
     {
         int score = 0;
