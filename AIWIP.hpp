@@ -10,6 +10,7 @@
 #define AIWIP_hpp
 
 #include "AIShell.h"
+#include "CQueue.hpp"
 
 
 class AIWIP: public AIShell {
@@ -23,16 +24,16 @@ protected:
     {
         GameNode* root = nullptr;
         GameNode* hold;
-        for (int col = 0; col<_num_col; col++){
-            for (int row = _num_row-1; row>=0; row--){
-                if (board[col][row] == cellType::EMPTY){
+        for (int col = 0; col < _num_col; col++) {
+            for (int row = _num_row - 1; row >= 0; row--) {
+                if (board[col][row] == cellType::EMPTY) {
                     hold = root;
                     // NOTE: here we create a GameNode - this will change later
                     // it is the callers responsibility to delete it
                     root = new GameNode;
-                    root->my_move=Move(col,row);
-                    root->next=hold;
-                    if(_gravity)
+                    root->my_move = Move(col, row);
+                    root->next = hold;
+                    if (_gravity)
                         break;
                 }
             }
@@ -41,7 +42,7 @@ protected:
     }
     virtual void _boardPopulated()
     {
-        buildScoring();
+        //buildScoring();
     }
     virtual bool moveToFront(GameNode** old_head, GameNode** new_head)
     {
@@ -51,7 +52,7 @@ protected:
         *new_head = hold->next;
         hold->next = *old_head;
         *old_head = hold;
-        D(std::cout << name<<": Moving last to head of list" << std::endl;)
+        D(std::cout << name << ": Moving last to head of list" << std::endl;)
         return false;
     }
     virtual int ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
@@ -65,7 +66,7 @@ protected:
         if (!*root)
             *root = getPossibleMoves(board);
         if (!*root)
-            return val = eval(board, !our_turn);
+            return val = eval3(board, _k);
 
         if (our_turn)
             best = INT_MIN;
@@ -77,26 +78,26 @@ protected:
             if (!_run)
                 throw 1;
             board.addMove((*walker)->my_move, turn);
-            D(std::cout<<name<<": added "<<(*walker)->my_move<<" at depth "<<search_depth-remaining_depth<<std::endl;)
+            D(std::cout << name << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval(board, our_turn);
+                val = eval3(board, our_turn);
             board.removeMove((*walker)->my_move);
-            D(std::cout<<name<<": removed "<<(*walker)->my_move<<" at depth "<<search_depth-remaining_depth<<std::endl;)
+            D(std::cout << name << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             (*walker)->value = val;
             if (our_turn)
             {
                 if (val > alpha)
                 {
-                    D(std::cout << name<<": new alpha: "<<val<<" old:"<<alpha << std::endl;)
+                    D(std::cout << name << ": new alpha: " << val << " old:" << alpha << std::endl;)
                     alpha = val;
                 }
                 if (val > best)
                 {
-                    D(std::cout << name<<": new best: "<<val<<" old:"<<best << std::endl;)
+                    D(std::cout << name << ": new best: " << val << " old:" << best << std::endl;)
                     best = val;
-                    if(moveToFront(root, walker))
+                    if (moveToFront(root, walker))
                         walker = &(*walker)->next;
                 }
                 else
@@ -106,13 +107,13 @@ protected:
             {
                 if (val > beta)
                 {
-                    D(std::cout << name<<": new beta: "<<val<<" old:"<<beta << std::endl;)
+                    D(std::cout << name << ": new beta: " << val << " old:" << beta << std::endl;)
                     beta = val;
                 }
                 if (val < best)
                 {
-                    D(std::cout << name<<": new best: "<<val<<" old:"<<best << std::endl;)
-                    if(moveToFront(root, walker))
+                    D(std::cout << name << ": new best: " << val << " old:" << best << std::endl;)
+                    if (moveToFront(root, walker))
                         walker = &(*walker)->next;
                     best = val;
                 }
@@ -122,17 +123,17 @@ protected:
             if (alpha >= beta)
             {
                 return best;
-                D(std::cout << name<<": trimming branch. returning "<<best <<" from depth "<<search_depth-remaining_depth<< std::endl;)
+                D(std::cout << name << ": trimming branch. returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
             }
 
         }
-        D(std::cout << name<<": returning "<<best<<" from depth "<<search_depth-remaining_depth << std::endl;)
+        D(std::cout << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
         return best;
     }
     virtual void _logic(int target_depth)
     {
         try {
-            search_depth = target_depth+1;
+            search_depth = target_depth + 1;
             int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
             if (_root)
             {
@@ -150,7 +151,7 @@ protected:
                 }
                 std::cout << "*************************" << std::endl;
                 _game.removeMove(_root->my_move);*/
-                
+
             }
             else
             {
@@ -210,7 +211,7 @@ protected:
         delete _root;
         _root = hold;
          */
-        if(_root)
+        if (_root)
         {
             delete _root;
             _root = nullptr;
@@ -233,71 +234,148 @@ protected:
      */
 
     //heuristic stuff:
-    
-    class EvalObject{
+
+    class EvalObject {
     public:
-        EvalObject(int k) : _k(k), _last(cellType::BOUNDRY), _score(0), _count(0), _gameover(false), _last_player(cellType::BOUNDRY), _player_count(0), _player_possilble(0)
-        {}
+        EvalObject(int k)
+        {
+            _gameover = false;
+            _k = k;
+            _score = 0;
+            queue = new CQueue(k);
+        }
         void operator() (const cellType cell)
         {
-            if(cell == _last)
-                ++_count;
-            else
-                _check(cell);
+            if (!queue->push(cell)) {
+                _score += _check(queue->get());
+                queue->pop();
+                if (!queue->push(cell))
+                    std::cout << "!!!!!something is wrong!!!!!" << std::endl;
+            }
         }
         void endl()
         {
-            _check(cellType::BOUNDRY);
+            queue->reset();
         }
         operator int()
         {
             return _score;
         }
-    private:
-        void _check(cellType cell)
+        bool gameOver()
         {
-            if (_gameover)
-                return;
-            
-            if(_count >= _k){
-                _gameover = true;
-                if(_last == cellType::US)
-                    _score = INT_MAX;
-                else if(_last == cellType::ENEMY)
-                    _score = INT_MIN;
-            }
-            // logic needed
+            return _gameover;
         }
+    private:
+        int _check(cellType * arrary)
+        {
+            int AIcount = 0;
+            int HMcount = 0;
+            for (int i = 0 ; i < _k; i++) {
+                if (arrary[i] == cellType::US)
+                    AIcount++;
+                else if ( arrary[i] == cellType::ENEMY)
+                    HMcount++;
+            }
+            if (AIcount && HMcount)
+                return 0;
+            else if (AIcount && !HMcount)
+            {
+                if (AIcount == _k)
+                {
+                    _gameover = true;
+                    return 1000;
+                }
+                else
+                    return 10 * AIcount;
+            }
+            else if (HMcount && !AIcount)
+            {
+                if (HMcount == _k)
+                {
+                    _gameover = true;
+                    return -1000;
+                }
+                else
+                    return -10 * HMcount;
+            }
+        }
+
         bool _gameover;
         int _k;
         int _score;
-        int _count;
-        cellType _last;
-        cellType _last_player;
-        int _player_count;
-        int _player_possilble;
-    
-    
-        
+        CQueue *queue;
     };
 
     int eval2(const GameBoard& board, bool our_turn)
     {
         int score = 0;
-        for(int i = 0; i<_num_col; ++i)
+        for (int i = 0; i < _num_col; ++i)
         {
             cellType last = cellType::BOUNDRY;
-            for(int j = 0; j<_num_row; ++j)
+            for (int j = 0; j < _num_row; ++j)
             {
-                
+
             }
         }
-        
-        
+
+
         return 0;
     }
-    
-    
+
+    int eval3(GameBoard& board, int k)
+    {
+        std::cout << "hello1" << std::endl;
+        EvalObject coleval (k);
+        EvalObject roweval (k);
+        EvalObject d1eval (k);
+        EvalObject d2eval (k);
+        std::cout << "hello2" << std::endl;
+
+        for (int i = 0; i < _num_row; i++ )
+        {
+            for (int j = 0; j < _num_col; j++)
+            {
+                roweval(board[j][i]);
+            }
+            roweval.endl();
+            if (roweval.gameOver())
+                return int(roweval) > 0 ? INT_MAX : INT_MIN;
+        }
+        std::cout << "hello3" << std::endl;
+
+        for (int i = 0; i < _num_col; i++ )
+        {
+            for (int j = 0; j < _num_row; j++)
+            {
+                coleval(board[j][i]);
+            }
+            coleval.endl();
+            if (coleval.gameOver())
+                return int(coleval) > 0 ? INT_MAX : INT_MIN;
+        }
+        std::cout << "hello4" << std::endl;
+
+        for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
+            for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
+                for (int i = 0; i < _k; i++) {
+                    d1eval(board[boardCol + i][boardRow + i]);
+                    d2eval(board[boardCol + i][boardRow + (_k - i - 1)]);
+                }
+                d1eval.endl();
+                d2eval.endl();
+                if (d1eval.gameOver())
+                    return int(d1eval) > 0 ? INT_MAX : INT_MIN;
+                if (d2eval.gameOver())
+                    return int(d2eval) > 0 ? INT_MAX : INT_MIN;
+            }
+        }
+        std::cout << "hello5" << std::endl;
+
+        return int(coleval) + int(roweval) + 5 * int(d1eval) + 5 * int(d2eval);
+
+    }
+
+
     int *_row; //socring for thw row
     int *_column;  //socring for the column
     int **_diagonal;
@@ -307,7 +385,7 @@ protected:
 
     //this only need to be called once per game
     void buildScoring() {
-        
+
         _row = new int [_num_col] ();
         _column = new int [_num_row]();
         _diagonal = new int*[_num_col];
@@ -422,7 +500,7 @@ protected:
 
 //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard & board, bool our_turn)    {
-        
+
         //std::cout << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;
@@ -440,7 +518,7 @@ protected:
         }
         int score = AIscore - HMscore + 100 * goalTest(board);
 
-        D(std::cout << name<<": score: " <<  score << std::endl;)
+        D(std::cout << name << ": score: " <<  score << std::endl;)
         /*std::cout << "AIscore: " <<  AIscore << std::endl;
         std::cout << "HMscore: " << HMscore << std::endl;
         std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
