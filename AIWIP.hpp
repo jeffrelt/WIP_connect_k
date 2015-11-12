@@ -253,12 +253,11 @@ protected:
 
     int eval3(GameBoard& board, int k)
     {
-        std::cout << "hello1" << std::endl;
+        
         EvalObject coleval (k);
         EvalObject roweval (k);
         EvalObject d1eval (k);
         EvalObject d2eval (k);
-        std::cout << "hello2" << std::endl;
 
         for (int i = 0; i < _num_row; i++ )
         {
@@ -270,7 +269,7 @@ protected:
             if (roweval.gameOver())
                 return int(roweval) > 0 ? INT_MAX : INT_MIN;
         }
-        std::cout << "hello3" << std::endl;
+
 
         for (int i = 0; i < _num_col; i++ )
         {
@@ -282,7 +281,6 @@ protected:
             if (coleval.gameOver())
                 return int(coleval) > 0 ? INT_MAX : INT_MIN;
         }
-        std::cout << "hello4" << std::endl;
 
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
             for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
@@ -298,9 +296,11 @@ protected:
                     return int(d2eval) > 0 ? INT_MAX : INT_MIN;
             }
         }
-        std::cout << "hello5" << std::endl;
 
-        return int(coleval) + int(roweval) + 5 * int(d1eval) + 5 * int(d2eval);
+        int score = int(coleval) + int(roweval) + 5 * int(d1eval) + 5 * int(d2eval);
+
+        std::cout << "score: " << score << std::endl;
+        return score;
 
     }
 

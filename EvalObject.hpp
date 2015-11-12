@@ -22,7 +22,8 @@ public:
     }
     void operator() (const cellType cell)
     {
-        if (!queue->push(cell)) {
+        bool temp = queue->push(cell);
+        if (!temp) {
             _score += _check(queue->get());
             queue->pop();
             if (!queue->push(cell))
@@ -31,6 +32,7 @@ public:
     }
     void endl()
     {
+        _score += _check(queue->get());
         queue->reset();
     }
     operator int()
@@ -42,7 +44,7 @@ public:
         return _gameover;
     }
 private:
-    int _check(cellType * arrary)
+    int _check(Cell * arrary)
     {
         int AIcount = 0;
         int HMcount = 0;
@@ -52,10 +54,16 @@ private:
             else if ( arrary[i] == ENEMY)
                 HMcount++;
         }
+/*
+        std::cout << "AI: " << AIcount << std::endl;
+        std::cout << "HM: " << HMcount << std::endl;
+*/
+        //both greater than 0
         if (AIcount && HMcount)
             return 0;
         else if (AIcount && !HMcount)
         {
+            //AI has more
             if (AIcount == _k)
             {
                 _gameover = true;
@@ -66,6 +74,7 @@ private:
         }
         else if (HMcount && !AIcount)
         {
+            //HM has more
             if (HMcount == _k)
             {
                 _gameover = true;
@@ -74,9 +83,12 @@ private:
             else
                 return -10 * HMcount;
         }
-        return 0;
+        else {
+            //both 0
+            return 0;
+        }
     }
-    
+
     bool _gameover;
     int _k;
     int _score;
