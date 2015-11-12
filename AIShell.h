@@ -7,6 +7,7 @@
 #include "GameNode.cpp"
 
 #define DEBUG_ON
+#define SINGLE_THREAD
 
 #ifdef DEBUG_ON
     #define SINGLE_THREAD
