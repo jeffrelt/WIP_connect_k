@@ -135,7 +135,7 @@ protected:
                 else
                 {
                     This->_game.addMove(m, ENEMY);
-                    D(std::cout << name << ": Enemy moved " << m << std::endl;)
+                    D(std::cout << this->name << ": Enemy moved " << m << std::endl;)
                 }
                 This->_cleanTree();
                 This->_run = true;

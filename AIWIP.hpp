@@ -25,7 +25,7 @@ protected:
         GameNode* root = NULL;
         GameNode* hold;
         for (int col = 0; col < _num_col; col++) {
-            for (int row = _num_row - 1; row >= 0; row--) {
+            for (int row = 0; row< _num_row; row++) {
                 if (board[col][row] == EMPTY) {
                     hold = root;
                     // NOTE: here we create a GameNode - this will change later
