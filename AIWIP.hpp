@@ -86,7 +86,7 @@ protected:
         while (*walker)
         {
             if (!_run)
-                throw 1;
+                return best;
             board.addMove((*walker)->my_move, turn);
             D(std::cout << turn << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             if (next_depth)
@@ -147,35 +147,29 @@ protected:
     }
     virtual void _logic(int target_depth)
     {
-        try {
-            search_depth = target_depth + 1;
-            int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
-            if (_root)
-            {
-                _move = _root->my_move;
+        search_depth = target_depth + 1;
+        int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
+        if (_run && _root)
+        {
+            _move = _root->my_move;
 
-                D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
-                D(std::cout << "*****************************************************************************************" << std::endl;)
-                /*
-                _game.addMove(_root->my_move,US);
-                std::cout << "*************************" << std::endl;
-                for (int i = 0; i < _num_row; i++) {
-                   //column
-                   for (int j = 0; j < _num_col ; j++) {
-                       std::cout << _game[j][i];
-                   }
-                   std::cout << std::endl;
-                }
-                std::cout << "*************************" << std::endl;
-                _game.removeMove(_root->my_move);*/
+            D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
+            D(std::cout << "*****************************************************************************************" << std::endl;)
+            /*
+            _game.addMove(_root->my_move,US);
+            std::cout << "*************************" << std::endl;
+            for (int i = 0; i < _num_row; i++) {
+               //column
+               for (int j = 0; j < _num_col ; j++) {
+                   std::cout << _game[j][i];
+               }
+               std::cout << std::endl;
+            }
+            std::cout << "*************************" << std::endl;
+            _game.removeMove(_root->my_move);*/
 
-            }
-            else
-            {
-                D(std::cout << name << ": Game is over!" << std::endl;)
-            }
         }
-        catch (int code)
+        else
         {
             D(std::cout << name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }

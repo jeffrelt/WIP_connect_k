@@ -2,12 +2,13 @@
 #define AISHELL_H
 
 #include <pthread.h>
+#include <unistd.h>
 #include <climits>
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
 //#define DEBUG_ON
-#define SINGLE_THREAD
+//#define SINGLE_THREAD
 
 #ifdef DEBUG_ON
     #define SINGLE_THREAD
@@ -52,7 +53,7 @@ public:
         }
         _boardPopulated();
 #ifndef SINGLE_THREAD
-        _builder = new std::thread(&AIShell::_buildGameTree,this);
+        pthread_create(&_builder, NULL, _buildGameTree, this);
 #endif
     }
     void enemyMove(Move their_move)
@@ -69,14 +70,14 @@ public:
     {
 #ifdef SINGLE_THREAD
         _cleanTree();
-        for(int i = 1; i<=3; i++)
+        for(int i = 1; i<=4; i++)
         {
             D(std::cout << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
         }
         _game.addMove(_move, US);
 #else
-        std::this_thread::sleep_for(std::chrono::milliseconds(deadline));
+        usleep(deadline*1000);
         _run = false;
         _move_count++;
 #endif
@@ -106,37 +107,38 @@ protected:
         }
         else
         {
-            //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            usleep(100);
         }
     }
     virtual void _cleanTree()
     {
         // for the children...
     }
-    void _buildGameTree()
+    static void* _buildGameTree(void *instance)
     {
+        AIShell* This = (AIShell*)instance;
         unsigned int depth = 1;
         while (1)
         {
-            _logic(depth);
-            if (_run)
+            This->_logic(depth);
+            if (This->_run)
                 depth++;
             else
             {
-                Move m(_move);
+                Move m(This->_move);
                 depth = 1;
-                if (_move_count & 1)
+                if (This->_move_count & 1)
                 {
-                    _game.addMove(m, US);
-                    D(std::cout << name << ": I moved " << m << std::endl;)
+                    This->_game.addMove(m, US);
+                    D(std::cout << This->name << ": I moved " << m << std::endl;)
                 }
                 else
                 {
-                    _game.addMove(m, ENEMY);
+                    This->_game.addMove(m, ENEMY);
                     D(std::cout << name << ": Enemy moved " << m << std::endl;)
                 }
-                _cleanTree();
-                _run = true;
+                This->_cleanTree();
+                This->_run = true;
             }
         }
     }
@@ -255,7 +257,7 @@ protected:
 
     }
 
-    //std::thread* _builder;
+    pthread_t _builder;
     bool _gravity;
     int _num_col;
     int _num_row;
