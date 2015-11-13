@@ -21,6 +21,7 @@ public:
 protected:
     virtual GameNode* getPossibleMoves(const GameBoard& board, bool best_only = false)
     {
+        D(std::cout << name << ": Generating possible moves";)
         GameNode* root = NULL;
         GameNode* hold;
         for (int col = 0; col < _num_col; col++) {
@@ -31,12 +32,14 @@ protected:
                     // it is the callers responsibility to delete it
                     root = new GameNode;
                     root->my_move = Move(col, row);
+                    D(std::cout <<", "<<root->my_move;)
                     root->next = hold;
                     if (_gravity)
                         break;
                 }
             }
         }
+        D(std::cout<< std::endl;)
         return root;
     }
     virtual void _boardPopulated()
@@ -45,7 +48,7 @@ protected:
     }
     virtual bool moveToFront(GameNode** old_head, GameNode** new_head)
     {
-        if (old_head == new_head)
+        if(old_head == new_head)
             return true;
         GameNode* hold = *new_head;
         *new_head = hold->next;
@@ -66,7 +69,15 @@ protected:
             *root = getPossibleMoves(board);
         if (!*root)
             return val = eval3(board, _k);
-
+        
+        D(int possible_count = 0;
+          while(*walker)
+          {
+              walker = &(*walker)->next;
+              ++possible_count;
+          }
+          walker = root;)
+        
         if (our_turn)
             best = INT_MIN;
         else
@@ -89,31 +100,31 @@ protected:
             {
                 if (val > alpha)
                 {
-                    D(std::cout << name << ": new alpha: " << val << " old:" << alpha << std::endl;)
+                    D(std::cout << turn << ": new alpha: " << val << " old:" << alpha << std::endl;)
                     alpha = val;
                 }
                 if (val > best)
                 {
-                    D(std::cout << name << ": new best: " << val << " old:" << best << std::endl;)
-                    best = val;
-                    if (moveToFront(root, walker))
+                    if(moveToFront(root,walker))
                         walker = &(*walker)->next;
+                    D(std::cout << turn << ": new best: " << val << " old:" << best << std::endl;)
+                    best = val;
                 }
                 else
                     walker = &(*walker)->next;
             }
             else
             {
-                if (val > beta)
+                if (val < beta)
                 {
-                    D(std::cout << name << ": new beta: " << val << " old:" << beta << std::endl;)
+                    D(std::cout << turn << ": new beta: " << val << " old:" << beta << std::endl;)
                     beta = val;
                 }
                 if (val < best)
                 {
-                    D(std::cout << name << ": new best: " << val << " old:" << best << std::endl;)
-                    if (moveToFront(root, walker))
+                    if(moveToFront(root,walker))
                         walker = &(*walker)->next;
+                    D(std::cout << turn << ": new best: " << val << " old:" << best << std::endl;)
                     best = val;
                 }
                 else
@@ -121,12 +132,17 @@ protected:
             }
             if (alpha >= beta)
             {
+                D(std::cout << name << ": trimming branch as a>=b ("<<alpha<<">="<<beta<<") returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
                 return best;
-                D(std::cout << name << ": trimming branch. returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
             }
-
+            D(--possible_count;)
         }
-        D(std::cout << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
+        D(std::cout << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;
+          if(possible_count)
+          {
+              std::cout << "**error we have not explored all moves! remaining: "<<possible_count<<std::endl;
+              throw "not all moves explored";
+          })
         return best;
     }
     virtual void _logic(int target_depth)

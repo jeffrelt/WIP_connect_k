@@ -65,8 +65,8 @@ private:
     int _check()
     {
 
-        D(std::cout << "AI: " << AIcount << std::endl;)
-        D(std::cout << "HM: " << HMcount << std::endl;)
+        //D(std::cout << "AI: " << AIcount << std::endl;)
+        //D(std::cout << "HM: " << HMcount << std::endl;)
 
         //both greater than 0
         if (AIcount && HMcount)

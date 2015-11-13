@@ -6,7 +6,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-#define DEBUG_ON
+//#define DEBUG_ON
 #define SINGLE_THREAD
 
 #ifdef DEBUG_ON
@@ -69,7 +69,7 @@ public:
     {
 #ifdef SINGLE_THREAD
         _cleanTree();
-        for(int i = 1; i<=1; i++)
+        for(int i = 1; i<=3; i++)
         {
             D(std::cout << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
