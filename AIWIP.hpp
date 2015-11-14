@@ -151,7 +151,9 @@ protected:
         int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
         if (_run && _root)
         {
+            pthread_mutex_lock( &_m );
             _move = _root->my_move;
+            pthread_mutex_unlock( &_m );
 
             D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
             D(std::cout << "*****************************************************************************************" << std::endl;)
