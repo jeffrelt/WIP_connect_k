@@ -149,38 +149,30 @@ protected:
     {
         search_depth = target_depth + 1;
         int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
-        if (_run && _root)
+        if (_root)
         {
 #ifndef SINGLE_THREAD
-            pthread_mutex_lock( &_m );
+            if(pthread_mutex_trylock(&_m))
+            {
+                out << name << ": Search over, stopped in depth " << target_depth << std::endl;
+                return;
+            }
 #endif
             _move = _root->my_move;
-            
-#ifndef SINGLE_THREAD
-            pthread_mutex_unlock( &_m );
-#endif
             out << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;
-            D(out<< "*****************************************************************************************" << std::endl;)
-            /*
-            _game.addMove(_root->my_move,US);
-            out << "*************************" << std::endl;
-            for (int i = 0; i < _num_row; i++) {
-               //column
-               for (int j = 0; j < _num_col ; j++) {
-                   out << _game[j][i];
-               }
-               out << std::endl;
-            }
-            out << "*************************" << std::endl;
-            _game.removeMove(_root->my_move);*/
-
+            D(out<< "**********************" << std::endl;)
+#ifndef SINGLE_THREAD
+            pthread_mutex_unlock(&_m);
+#endif
         }
         else
         {
-            D(out << name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
+            out << name << ": Game Over!"<< std::endl<<"*********************************************" << std::endl;
+#ifndef SINGLE_THREAD
+            pthread_exit(NULL);
+#endif
         }
-
-
+        
         /* iterative may be attempted later...
         GameNode** walker = &_root;
         while(_run)

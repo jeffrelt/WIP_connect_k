@@ -8,7 +8,7 @@
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-#define DEBUG_ON
+//#define DEBUG_ON
 //#define SINGLE_THREAD
 
 #ifdef DEBUG_ON
@@ -51,9 +51,12 @@ public:
         }
         _boardPopulated();
 #ifndef SINGLE_THREAD
+        pthread_mutex_init(&_building, NULL);
+        pthread_mutex_init(&_m, NULL);
         pthread_create(&_builder, NULL, _buildGameTree, this);
 #endif
     }
+
     
     void enemyMove(Move their_move)
     {
@@ -61,21 +64,25 @@ public:
         _game.addMove(their_move, ENEMY);
 #else
         pthread_mutex_lock( &_m );
+        _run = false;
         _move = their_move;
         _move_count++;
-        _run = false;
+        pthread_mutex_lock( &_building );
+        pthread_mutex_unlock( &_building );
         pthread_mutex_unlock( &_m );
 #endif
     }
     
     Move makeMove(int deadline)
     {
+        Move return_move;
 #ifdef SINGLE_THREAD
         _cleanTree();
         for(int i = 1; i<=4; i++)
         {
             D(out << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
+            return_move = _move;
         }
         _game.addMove(_move, US);
 #else
@@ -83,10 +90,16 @@ public:
         pthread_mutex_lock( &_m );
         _run = false;
         _move_count++;
+        return_move = _move;
+        pthread_mutex_lock( &_building );
+        return_move = _move;
+        pthread_mutex_unlock( &_building );
         pthread_mutex_unlock( &_m );
 #endif
-        return Move(_move);
+        return return_move;
     }
+    
+
     int isGameover()
     {
         return goalTest(_game);
@@ -123,6 +136,7 @@ protected:
     {
         AIShell* This = (AIShell*)instance;
         unsigned int depth = 1;
+        pthread_mutex_lock( &This->_building );
         while (1)
         {
             This->_logic(depth);
@@ -130,25 +144,23 @@ protected:
                 depth++;
             else
             {
-                
-                Move m(This->_move);
                 depth = 1;
                 if (This->_move_count & 1)
                 {
-                    This->_game.addMove(m, US);
-                    D(This->out << This->name << ": I moved " << m << std::endl;)
+                    This->_game.addMove(This->_move, US);
+                    This->out <<"***" <<This->name << ": I moved " << This->_move << std::endl;
                 }
                 else
                 {
-                    This->_game.addMove(m, ENEMY);
-                    D(This->out << This->name << ": Enemy moved " << m << std::endl;)
+                    This->_game.addMove(This->_move, ENEMY);
+                    This->out <<"***" << This->name << ": Enemy moved " << This->_move << std::endl;
                 }
                 This->_cleanTree();
-#ifndef SINGLE_THREAD
+                pthread_mutex_unlock( &This->_building );
                 pthread_mutex_lock( &This->_m );
                 This->_run = true;
                 pthread_mutex_unlock( &This->_m );
-#endif
+                pthread_mutex_lock( &This->_building );
             }
         }
     }
@@ -266,18 +278,16 @@ protected:
         return 0;
 
     }
-#ifndef SINGLE_THREAD
     pthread_t _builder;
+    pthread_mutex_t _building;
     pthread_mutex_t _m;
-    pthread_cond_t _cv;
-#endif
     bool _gravity;
     int _num_col;
     int _num_row;
     int _k;
     GameBoard _game;
     Move _move;
-    bool _run;
+    volatile bool _run;
     int _move_count;
 };
 

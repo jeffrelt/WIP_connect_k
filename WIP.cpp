@@ -84,6 +84,8 @@ int main() {
             std::cout<<which<<" moved: "<<last_move<<std::endl;
             which^=1;
             std::cout<<shell.out.str()<<std::endl;
+            shell.out.str("");
+            shell.out.clear();
             returnMove( last_move );
             getNextMove(last_move, deadline);
             shell.enemyMove( last_move );
