@@ -21,7 +21,7 @@ public:
 protected:
     virtual GameNode* getPossibleMoves(const GameBoard& board, bool best_only = false)
     {
-        D(std::cout << name << ": Generating possible moves";)
+        D(out << name << ": Generating possible moves";)
         GameNode* root = NULL;
         GameNode* hold;
         for (int col = 0; col < _num_col; col++) {
@@ -32,14 +32,14 @@ protected:
                     // it is the callers responsibility to delete it
                     root = new GameNode;
                     root->my_move = Move(col, row);
-                    D(std::cout <<", "<<root->my_move;)
+                    D(out <<", "<<root->my_move;)
                     root->next = hold;
                     if (_gravity)
                         break;
                 }
             }
         }
-        D(std::cout<< std::endl;)
+        D(out<< std::endl;)
         return root;
     }
     virtual void _boardPopulated()
@@ -54,7 +54,7 @@ protected:
         *new_head = hold->next;
         hold->next = *old_head;
         *old_head = hold;
-        D(std::cout << name << ": Moving last to head of list" << std::endl;)
+        D(out << name << ": Moving last to head of list" << std::endl;)
         return false;
     }
     virtual int ids(int alpha, int beta, GameNode** root, GameBoard board, int remaining_depth, cellType turn)
@@ -88,26 +88,26 @@ protected:
             if (!_run)
                 return best;
             board.addMove((*walker)->my_move, turn);
-            D(std::cout << turn << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
+            D(out << turn << ": added " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
                 val = eval3(board, _k);
             board.removeMove((*walker)->my_move);
-            D(std::cout << turn << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
+            D(out << turn << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             (*walker)->value = val;
             if (our_turn)
             {
                 if (val > alpha)
                 {
-                    D(std::cout << turn << ": new alpha: " << val << " old:" << alpha << std::endl;)
+                    D(out << turn << ": new alpha: " << val << " old:" << alpha << std::endl;)
                     alpha = val;
                 }
                 if (val > best)
                 {
                     if(moveToFront(root,walker))
                         walker = &(*walker)->next;
-                    D(std::cout << turn << ": new best: " << val << " old:" << best << std::endl;)
+                    D(out << turn << ": new best: " << val << " old:" << best << std::endl;)
                     best = val;
                 }
                 else
@@ -117,14 +117,14 @@ protected:
             {
                 if (val < beta)
                 {
-                    D(std::cout << turn << ": new beta: " << val << " old:" << beta << std::endl;)
+                    D(out << turn << ": new beta: " << val << " old:" << beta << std::endl;)
                     beta = val;
                 }
                 if (val < best)
                 {
                     if(moveToFront(root,walker))
                         walker = &(*walker)->next;
-                    D(std::cout << turn << ": new best: " << val << " old:" << best << std::endl;)
+                    D(out << turn << ": new best: " << val << " old:" << best << std::endl;)
                     best = val;
                 }
                 else
@@ -132,15 +132,15 @@ protected:
             }
             if (alpha >= beta)
             {
-                D(std::cout << name << ": trimming branch as a>=b ("<<alpha<<">="<<beta<<") returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
+                D(out << name << ": trimming branch as a>=b ("<<alpha<<">="<<beta<<") returning " << best << " from depth " << search_depth - remaining_depth << std::endl;)
                 return best;
             }
             D(--possible_count;)
         }
-        D(std::cout << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;
+        D(out << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;
           if(possible_count)
           {
-              std::cout << "**error we have not explored all moves! remaining: "<<possible_count<<std::endl;
+              out << "**error we have not explored all moves! remaining: "<<possible_count<<std::endl;
               throw "not all moves explored";
           })
         return best;
@@ -151,29 +151,33 @@ protected:
         int best = ids(INT_MIN, INT_MAX, &_root, _game, target_depth, cellType(2 | (_move_count & 1)));
         if (_run && _root)
         {
+#ifndef SINGLE_THREAD
             pthread_mutex_lock( &_m );
+#endif
             _move = _root->my_move;
+            
+#ifndef SINGLE_THREAD
             pthread_mutex_unlock( &_m );
-
-            D(std::cout << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
-            D(std::cout << "*****************************************************************************************" << std::endl;)
+#endif
+            out << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;
+            D(out<< "*****************************************************************************************" << std::endl;)
             /*
             _game.addMove(_root->my_move,US);
-            std::cout << "*************************" << std::endl;
+            out << "*************************" << std::endl;
             for (int i = 0; i < _num_row; i++) {
                //column
                for (int j = 0; j < _num_col ; j++) {
-                   std::cout << _game[j][i];
+                   out << _game[j][i];
                }
-               std::cout << std::endl;
+               out << std::endl;
             }
-            std::cout << "*************************" << std::endl;
+            out << "*************************" << std::endl;
             _game.removeMove(_root->my_move);*/
 
         }
         else
         {
-            D(std::cout << name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
+            D(out << name << ": Turn over. Made it to Depth " << target_depth - 1 << std::endl;)
         }
 
 
@@ -273,7 +277,7 @@ protected:
         EvalObject d1eval (k);
         EvalObject d2eval (k);
 
-        D(std::cout << "roweval" << std::endl;)
+        D(out << "roweval" << std::endl;)
         for (int i = 0; i < _num_row; i++ )
         {
             for (int j = 0; j < _num_col; j++)
@@ -286,7 +290,7 @@ protected:
         }
 
 
-        D(std::cout << "coleval" << std::endl;)
+        D(out << "coleval" << std::endl;)
         for (int i = 0; i < _num_col; i++ )
         {
             for (int j = 0; j < _num_row; j++)
@@ -298,7 +302,7 @@ protected:
                 return int(coleval) > 0 ? INT_MAX : INT_MIN;
         }
 
-        D(std::cout << "deval" << std::endl;)
+        D(out << "deval" << std::endl;)
         for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
             for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
                 for (int i = 0; i < _k; i++) {
@@ -316,11 +320,11 @@ protected:
 
         int score = int(coleval) + int(roweval) + int(d1eval) + int(d2eval);
 
-        D(std::cout << "score: " << score << std::endl;)
-        D(std::cout << "coleval: " << int(coleval) << std::endl;)
-        D(std::cout << "roweval: " << int(roweval) << std::endl;)
-        D(std::cout << "d1eval: " << int(d1eval) << std::endl;)
-        D(std::cout << "d2eval: " << int(d2eval) << std::endl;)
+        D(out << "score: " << score << std::endl;)
+        D(out << "coleval: " << int(coleval) << std::endl;)
+        D(out << "roweval: " << int(roweval) << std::endl;)
+        D(out << "d1eval: " << int(d1eval) << std::endl;)
+        D(out << "d2eval: " << int(d2eval) << std::endl;)
 
         return score;
 
@@ -349,36 +353,36 @@ protected:
         for (int i = 0; i < _num_col; i++) {
             _diagonal[i] = new int[_num_row]();
         }
-        D(std::cout << name << ": after_new" << std::endl;)
+        D(out << name << ": after_new" << std::endl;)
 
         int col_number = calculateMax(_num_col);
         int row_number = calculateMax(_num_row);
         int temp = 0;
-        D(std::cout << name << ": after calc_max" << std::endl;)
+        D(out << name << ": after calc_max" << std::endl;)
         buildHelper(_column, col_number, _num_col);
         buildHelper(_row, row_number, _num_row);
-        D(std::cout << name << ": after build_helpers" << std::endl;)
+        D(out << name << ": after build_helpers" << std::endl;)
         diagHelper();
 
-        D(std::cout << name << ": post_helper" << std::endl;)
-        D(std::cout << "row: " << std::endl;)
+        D(out << name << ": post_helper" << std::endl;)
+        D(out << "row: " << std::endl;)
         for (int i = 0; i < _num_row; i++) {
-            D(std::cout << _row[i];)
+            D(out << _row[i];)
         }
-        D(std::cout << std::endl;)
+        D(out << std::endl;)
 
-        D(std::cout << "column: " << std::endl;)
+        D(out << "column: " << std::endl;)
         for (int i = 0; i < _num_col; i++) {
-            D(std::cout << _column[i];)
+            D(out << _column[i];)
         }
-        D(std::cout << std::endl;)
+        D(out << std::endl;)
 
-        D(std::cout << "diagonal: " << std::endl;)
+        D(out << "diagonal: " << std::endl;)
         for (int col = 0; col < _num_col; col++) {
             for (int row = 0; row < _num_row; row++) {
-                D(std::cout << _diagonal[col][row];)
+                D(out << _diagonal[col][row];)
             }
-            D(std::cout << std::endl;)
+            D(out << std::endl;)
         }
     }
 
@@ -392,7 +396,7 @@ protected:
             temp[i][i] = temp[i][i] + 1;
             temp[i][_k - i - 1] = temp[i][_k - i - 1] + 1 ;
         }
-        D(std::cout << name << ": before diagApply" << std::endl;)
+        D(out << name << ": before diagApply" << std::endl;)
         diagApply(temp);
 
     }
@@ -452,7 +456,7 @@ protected:
 //call this to eval the gameboard everything else I added are just to build scoring sheets
     int eval(const GameBoard & board, bool our_turn)    {
 
-        //std::cout << "start eval" << std::endl;
+        //out << "start eval" << std::endl;
         int AIscore = 0;
         int HMscore = 0;
         //i is column
@@ -469,10 +473,10 @@ protected:
         }
         int score = AIscore - HMscore + 100 * goalTest(board);
 
-        D(std::cout << name << ": score: " <<  score << std::endl;)
-        /*std::cout << "AIscore: " <<  AIscore << std::endl;
-        std::cout << "HMscore: " << HMscore << std::endl;
-        std::cout << "Goaltest: " << goalTest(board) << std::endl;*/
+        D(out << name << ": score: " <<  score << std::endl;)
+        /*out << "AIscore: " <<  AIscore << std::endl;
+        out << "HMscore: " << HMscore << std::endl;
+        out << "Goaltest: " << goalTest(board) << std::endl;*/
         return score;
     }
 

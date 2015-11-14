@@ -24,6 +24,7 @@ void say(const std::string message)
 void returnMove(Move move){
     //outputs madeMove then a space then the row then a space then the column
     //then a line break.
+    std::stringstream msg;
     std::cout<<"ReturningTheMoveMade "<<move<<std::endl;
 }
 
@@ -82,8 +83,8 @@ int main() {
             which^=1;
             std::cout<<which<<" moved: "<<last_move<<std::endl;
             which^=1;
+            std::cout<<shell.out.str()<<std::endl;
             returnMove( last_move );
-            
             getNextMove(last_move, deadline);
             shell.enemyMove( last_move );
         }

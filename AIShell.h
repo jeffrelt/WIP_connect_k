@@ -4,10 +4,11 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <climits>
+#include <sstream>
 #include "GameBoard.hpp"
 #include "GameNode.cpp"
 
-//#define DEBUG_ON
+#define DEBUG_ON
 //#define SINGLE_THREAD
 
 #ifdef DEBUG_ON
@@ -45,7 +46,7 @@ public:
         _game.setBoard(num_col, num_row);
         if (last_move.getCol() != -1)
         {
-            D(std::cout << name << ": Enemy moved " << last_move << std::endl;)
+            D(out << name << ": Enemy moved " << last_move << std::endl;)
             _game.addMove(last_move, ENEMY);
         }
         _boardPopulated();
@@ -73,7 +74,7 @@ public:
         _cleanTree();
         for(int i = 1; i<=4; i++)
         {
-            D(std::cout << name << ": Starting search at depth " << i << std::endl;)
+            D(out << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
         }
         _game.addMove(_move, US);
@@ -91,6 +92,7 @@ public:
         return goalTest(_game);
     }
     std::string name;
+    std::stringstream out;
 protected:
     virtual void _boardPopulated()
     {
@@ -134,17 +136,19 @@ protected:
                 if (This->_move_count & 1)
                 {
                     This->_game.addMove(m, US);
-                    D(std::cout << This->name << ": I moved " << m << std::endl;)
+                    D(This->out << This->name << ": I moved " << m << std::endl;)
                 }
                 else
                 {
                     This->_game.addMove(m, ENEMY);
-                    D(std::cout << this->name << ": Enemy moved " << m << std::endl;)
+                    D(This->out << This->name << ": Enemy moved " << m << std::endl;)
                 }
                 This->_cleanTree();
+#ifndef SINGLE_THREAD
                 pthread_mutex_lock( &This->_m );
                 This->_run = true;
                 pthread_mutex_unlock( &This->_m );
+#endif
             }
         }
     }
