@@ -5,6 +5,8 @@
 //  Created by Jeffrey Thompson on 11/11/15.
 //  Copyright © 2015 Jeffrey Thompson. All rights reserved.
 //
+#ifndef EvalObject_hpp
+#define EvalObject_hpp
 
 #include "CQueue.h"
 #include <iostream>

@@ -13,6 +13,7 @@
 #include "Move.h"
 #include "GameNode.h"
 
+enum cellType{ EMPTY=0, BOUNDRY=1, US=2, ENEMY=3 };
 
 struct Cell{
     
