@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include "AIWIP.h"
+#include "AIWIP.hpp"
 
 void say(const char* message)
 {
