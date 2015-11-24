@@ -13,10 +13,10 @@
 #define SINGLE_THREAD
 
 #ifdef DEBUG_ON
-    #define SINGLE_THREAD
-    #define D(x) x
+#define SINGLE_THREAD
+#define D(x) x
 #else
-    #define D(x)
+#define D(x)
 #endif
 
 
@@ -35,7 +35,7 @@ public:
     ~AIShell()
     {
     }
-    
+
     void setBoard(bool gravity, int num_col, int num_row, int k, Move last_move)
     {
         _gravity = gravity;
@@ -58,7 +58,7 @@ public:
 #endif
     }
 
-    
+
     void enemyMove(Move their_move)
     {
 #ifdef SINGLE_THREAD
@@ -73,13 +73,14 @@ public:
         pthread_mutex_unlock( &_m );
 #endif
     }
-    
+
     Move makeMove(int deadline)
     {
         Move return_move;
 #ifdef SINGLE_THREAD
         _cleanTree();
-        for(int i = 1; i<=4; i++)
+        int depth = _gravity ? 8 : 3;
+        for (int i = 1; i <= depth; i++)
         {
             D(out << name << ": Starting search at depth " << i << std::endl;)
             _logic(i);
@@ -87,7 +88,7 @@ public:
         }
         _game.addMove(_move, US);
 #else
-        usleep(deadline*1000);
+        usleep(deadline * 1000);
         pthread_mutex_lock( &_m );
         _run = false;
         _move_count++;
@@ -99,7 +100,7 @@ public:
 #endif
         return return_move;
     }
-    
+
 
     int isGameover()
     {
@@ -149,12 +150,12 @@ protected:
                 if (This->_move_count & 1)
                 {
                     This->_game.addMove(This->_move, US);
-                    D(This->out <<"***" <<This->name << ": I moved " << This->_move << std::endl;)
+                    D(This->out << "***" << This->name << ": I moved " << This->_move << std::endl;)
                 }
                 else
                 {
                     This->_game.addMove(This->_move, ENEMY);
-                    D(This->out <<"***" << This->name << ": Enemy moved " << This->_move << std::endl;)
+                    D(This->out << "***" << This->name << ": Enemy moved " << This->_move << std::endl;)
                 }
                 This->_cleanTree();
                 pthread_mutex_unlock( &This->_building );
@@ -194,7 +195,7 @@ protected:
                     vscore = 0;
                 }
                 if (std::abs(vscore) == _k) {
-                    return vscore > 0 ? 500:-500;
+                    return vscore > 0 ? 500 : -500;
                 }
             }
         }
@@ -222,7 +223,7 @@ protected:
                     hscore = 0;
                 }
                 if (std::abs(hscore) == _k) {
-                    return hscore > 0 ? 500:-500;
+                    return hscore > 0 ? 500 : -500;
                 }
             }
         }
@@ -249,7 +250,7 @@ protected:
                         d1score = 0;
                     }
                     if (std::abs(d1score) == _k) {
-                        return d1score > 0 ? 500:-500;
+                        return d1score > 0 ? 500 : -500;
                     }
 
 
@@ -270,7 +271,7 @@ protected:
                         d2score = 0;
                     }
                     if (std::abs(d2score) == _k) {
-                        return d2score > 0 ? 500:-500;
+                        return d2score > 0 ? 500 : -500;
                     }
                 }
             }
