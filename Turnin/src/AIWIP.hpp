@@ -140,7 +140,7 @@ protected:
         D(out << name << ": returning " << best << " from depth " << search_depth - remaining_depth << std::endl;
           if(possible_count)
           {
-              out << "**error we have not explored all moves! remaining: "<<possible_count<<std::endl;
+              D(out << "**error we have not explored all moves! remaining: "<<possible_count<<std::endl;)
               throw "not all moves explored";
           })
         return best;
@@ -154,12 +154,12 @@ protected:
 #ifndef SINGLE_THREAD
             if(pthread_mutex_trylock(&_m))
             {
-                out << name << ": Search over, stopped in depth " << target_depth << std::endl;
+                D(out << name << ": Search over, stopped in depth " << target_depth << std::endl;)
                 return;
             }
 #endif
             _move = _root->my_move;
-            out << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;
+            D(out << name << ": best from search at depth " << target_depth << " is " << _move << " with a score of " << best << std::endl;)
             D(out<< "**********************" << std::endl;)
 #ifndef SINGLE_THREAD
             pthread_mutex_unlock(&_m);
@@ -167,7 +167,7 @@ protected:
         }
         else
         {
-            out << name << ": Game Over!"<< std::endl<<"*********************************************" << std::endl;
+            D(out << name << ": Game Over!"<< std::endl<<"*********************************************" << std::endl;)
 #ifndef SINGLE_THREAD
             pthread_exit(NULL);
 #endif

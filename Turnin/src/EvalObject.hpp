@@ -26,8 +26,6 @@ public:
     }
     void operator() (const cellType cell)
     {
-
-
         if (!queue->push(cell)) {
             _score += _check();
             cellType temp = queue->pop();
@@ -38,7 +36,9 @@ public:
             else if (temp == EMPTY)
                 Empty--;
             if (!queue->push(cell))
-                std::cout << "!!!!!something is wrong!!!!!" << std::endl;
+            {
+                D(std::cout << "!!!!!something is wrong!!!!!" << std::endl;)
+            }
             else {
                 if (cell == US)
                     AIcount++;

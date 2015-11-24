@@ -149,12 +149,12 @@ protected:
                 if (This->_move_count & 1)
                 {
                     This->_game.addMove(This->_move, US);
-                    This->out <<"***" <<This->name << ": I moved " << This->_move << std::endl;
+                    D(This->out <<"***" <<This->name << ": I moved " << This->_move << std::endl;)
                 }
                 else
                 {
                     This->_game.addMove(This->_move, ENEMY);
-                    This->out <<"***" << This->name << ": Enemy moved " << This->_move << std::endl;
+                    D(This->out <<"***" << This->name << ": Enemy moved " << This->_move << std::endl;)
                 }
                 This->_cleanTree();
                 pthread_mutex_unlock( &This->_building );
