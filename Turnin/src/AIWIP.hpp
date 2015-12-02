@@ -246,7 +246,6 @@ protected:
 
     int eval(GameBoard& board, int k)
     {
-
         EvalObject coleval (k);
         EvalObject roweval (k);
         EvalObject d1eval (k);
@@ -293,7 +292,7 @@ protected:
             }
         }
 
-        int score = int(coleval) + int(roweval) + int(d1eval) + int(d2eval);
+        int score = int(coleval) + int(roweval) + 10*int(d1eval) + 10*int(d2eval);
 
         D(out << "score: " << score << std::endl;)
         D(out << "coleval: " << int(coleval) << std::endl;)
