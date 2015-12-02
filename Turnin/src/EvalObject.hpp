@@ -74,10 +74,6 @@ public:
     {
         return _gameover;
     }
-    ~EvalObject()
-    {
-        delete [] queue;
-    }
 private:
     int _check()
     {
