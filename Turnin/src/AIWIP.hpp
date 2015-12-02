@@ -68,7 +68,7 @@ protected:
         if (!*root)
             *root = getPossibleMoves(board);
         if (!*root)
-            return val = eval3(board, _k);
+            return val = eval(board, _k);
         
         D(int possible_count = 0;
           while(*walker)
@@ -92,7 +92,7 @@ protected:
             if (next_depth)
                 val = ids(alpha, beta, &(*walker)->child, board, next_depth, next_turn);
             else
-                val = eval3(board, _k);
+                val = eval(board, _k);
             board.removeMove((*walker)->my_move);
             D(out << turn << ": removed " << (*walker)->my_move << " at depth " << search_depth - remaining_depth << std::endl;)
             (*walker)->value = val;
@@ -244,24 +244,7 @@ protected:
 
     //heuristic stuff:
 
-
-    int eval2(const GameBoard& board, bool our_turn)
-    {
-        int score = 0;
-        for (int i = 0; i < _num_col; ++i)
-        {
-            cellType last = BOUNDRY;
-            for (int j = 0; j < _num_row; ++j)
-            {
-
-            }
-        }
-
-
-        return 0;
-    }
-
-    int eval3(GameBoard& board, int k)
+    int eval(GameBoard& board, int k)
     {
 
         EvalObject coleval (k);
@@ -321,157 +304,6 @@ protected:
         return score;
 
     }
-
-
-    int *_row; //socring for thw row
-    int *_column;  //socring for the column
-    int **_diagonal;
-    int calculateMax(int number)   {
-        return (number - _k + 1);
-    }
-
-    //this only need to be called once per game
-    void buildScoring() {
-
-        _row = new int [_num_col] ();
-        _column = new int [_num_row]();
-        _diagonal = new int*[_num_col];
-        for (int i = 0; i < _num_col; i++) {
-            _diagonal[i] = new int[_num_row]();
-        }
-        _row = new int [_num_col] ();
-        _column = new int [_num_row]();
-        _diagonal = new int*[_num_col];
-        for (int i = 0; i < _num_col; i++) {
-            _diagonal[i] = new int[_num_row]();
-        }
-        D(out << name << ": after_new" << std::endl;)
-
-        int col_number = calculateMax(_num_col);
-        int row_number = calculateMax(_num_row);
-        int temp = 0;
-        D(out << name << ": after calc_max" << std::endl;)
-        buildHelper(_column, col_number, _num_col);
-        buildHelper(_row, row_number, _num_row);
-        D(out << name << ": after build_helpers" << std::endl;)
-        diagHelper();
-
-        D(out << name << ": post_helper" << std::endl;)
-        D(out << "row: " << std::endl;)
-        for (int i = 0; i < _num_row; i++) {
-            D(out << _row[i];)
-        }
-        D(out << std::endl;)
-
-        D(out << "column: " << std::endl;)
-        for (int i = 0; i < _num_col; i++) {
-            D(out << _column[i];)
-        }
-        D(out << std::endl;)
-
-        D(out << "diagonal: " << std::endl;)
-        for (int col = 0; col < _num_col; col++) {
-            for (int row = 0; row < _num_row; row++) {
-                D(out << _diagonal[col][row];)
-            }
-            D(out << std::endl;)
-        }
-    }
-
-    void diagHelper() {
-        int ** temp = new int* [_k];
-        for (int i = 0; i < _k; i++) {
-            temp[i] = new int[_k]();
-        }
-
-        for (int i = 0; i < _k; i++) {
-            temp[i][i] = temp[i][i] + 1;
-            temp[i][_k - i - 1] = temp[i][_k - i - 1] + 1 ;
-        }
-        D(out << name << ": before diagApply" << std::endl;)
-        diagApply(temp);
-
-    }
-    void diagApply(int **kboard) {
-        for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
-            for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
-                for (int i = 0; i < _k; i++) {
-                    _diagonal[boardCol + i][boardRow + i] += kboard[i][i];
-                    _diagonal[boardCol + i][boardRow + (_k - i - 1)] += kboard[i][(_k - i - 1)];
-                }
-            }
-        }
-    }
-
-    void buildHelper(int *array, int maxium, int size) {
-        bool flag = _k < maxium;
-
-        int changeIndex = std::max(maxium, (int)_k);
-        //ture change from max
-        if (flag) {
-            int temp = 1;
-            int i = 0;
-            for (; i < changeIndex; i++ ) {
-                if (temp >= _k) {
-                    array[i] = _k;
-                }
-                else {
-                    array[i] = temp++;
-                }
-            }
-            temp = _k - 1;
-            for (; i < size; i++) {
-                array[i] = temp--;
-            }
-
-        }
-        //false chage from _k
-        else {
-            int temp = 1;
-            int i = 0;
-            for (; i < changeIndex; i++ ) {
-                if (temp >= maxium) {
-                    array[i] = maxium;
-                }
-                else {
-                    array[i] = temp++;
-                }
-            }
-            temp = maxium - 1;
-            for (; i < size; i++) {
-                array[i] = temp--;
-            }
-        }
-    }
-
-
-//call this to eval the gameboard everything else I added are just to build scoring sheets
-    int eval(const GameBoard & board, bool our_turn)    {
-
-        //out << "start eval" << std::endl;
-        int AIscore = 0;
-        int HMscore = 0;
-        //i is column
-        for (int i = 0; i < _num_col; i++) {
-            //j is row
-            for (int j = 0; j < _num_row ; j++) {
-                if (board[i][j] == US) {
-                    AIscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
-                }
-                else if (board[i][j] == ENEMY) {
-                    HMscore += 5 * _column[i] + 5 * _row[j] + 10 * _diagonal[i][j];
-                }
-            }
-        }
-        int score = AIscore - HMscore + 100 * goalTest(board);
-
-        D(out << name << ": score: " <<  score << std::endl;)
-        /*out << "AIscore: " <<  AIscore << std::endl;
-        out << "HMscore: " << HMscore << std::endl;
-        out << "Goaltest: " << goalTest(board) << std::endl;*/
-        return score;
-    }
-
 
 };
 
