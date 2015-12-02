@@ -88,7 +88,7 @@ public:
         }
         _game.addMove(_move, US);
 #else
-        usleep(deadline * 1000);
+        usleep((deadline * 1000)-500);
         pthread_mutex_lock( &_m );
         _run = false;
         _move_count++;
