@@ -93,7 +93,7 @@ private:
                 return 5000;
             }
             else
-                return 30 * AIcount  - 4 * Empty;
+                return 30 * AIcount  - 5 * Empty;
         }
         else if (HMcount && !AIcount)
         {
@@ -104,7 +104,7 @@ private:
                 return -5000;
             }
             else
-                return -30 * HMcount + 4 * Empty;
+                return -30 * HMcount + 5 * Empty;
         }
         else {
             //both 0

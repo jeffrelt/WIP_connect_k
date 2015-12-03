@@ -10,7 +10,7 @@
 #include <cmath>
 
 //#define DEBUG_ON
-#define SINGLE_THREAD
+//#define SINGLE_THREAD
 
 #ifdef DEBUG_ON
 #define SINGLE_THREAD
@@ -88,7 +88,7 @@ public:
         }
         _game.addMove(_move, US);
 #else
-        usleep((deadline * 1000)-500);
+        usleep(deadline * 1000);
         pthread_mutex_lock( &_m );
         _run = false;
         _move_count++;
@@ -99,12 +99,6 @@ public:
         pthread_mutex_unlock( &_m );
 #endif
         return return_move;
-    }
-
-
-    int isGameover()
-    {
-        return goalTest(_game);
     }
     std::string name;
     std::stringstream out;
@@ -165,120 +159,6 @@ protected:
                 pthread_mutex_lock( &This->_building );
             }
         }
-    }
-
-    int goalTest(const GameBoard& board) {
-        //0 no wining move on us or the enemy
-        //positive we are wining
-        //negative we are going to lose
-        int vscore = 0;
-
-        //column
-        for (int i = 0; i < _num_col; i++) {
-            //row
-            for (int j = 0; j < _num_row; j++) {
-
-                if (board[i][j] == US)
-                {
-                    if (vscore < 0)
-                        vscore = 0;
-                    vscore++;
-                }
-                else if (board[i][j] == ENEMY)
-                {
-                    if (vscore > 0)
-                        vscore = 0;
-                    vscore--;
-                }
-                else if (board[i][j] == EMPTY)
-                {
-                    vscore = 0;
-                }
-                if (std::abs(vscore) == _k) {
-                    return vscore > 0 ? 500 : -500;
-                }
-            }
-        }
-
-        int hscore = 0;
-        //row
-        for (int i = 0; i < _num_row; i++) {
-            //column
-            for (int j = 0; j < _num_col ; j++) {
-
-                if (board[j][i] == US)
-                {
-                    if (hscore < 0)
-                        hscore = 0;
-                    hscore++;
-                }
-                else if (board[j][i] == ENEMY)
-                {
-                    if (hscore > 0)
-                        hscore = 0;
-                    hscore--;
-                }
-                else if (board[j][i] == EMPTY)
-                {
-                    hscore = 0;
-                }
-                if (std::abs(hscore) == _k) {
-                    return hscore > 0 ? 500 : -500;
-                }
-            }
-        }
-
-        int d1score = 0;
-        int d2score = 0;
-        for (int boardCol = 0; boardCol < _num_col - _k + 1; boardCol++) {
-            for (int boardRow = 0; boardRow < _num_row - _k + 1; boardRow++) {
-                for (int i = 0; i < _k; i++) {
-                    if (board[boardCol + i][boardRow + i]  == US)
-                    {
-                        if (d1score < 0)
-                            d1score = 0;
-                        d1score++;
-                    }
-                    else if (board[boardCol + i][boardRow + i] == ENEMY)
-                    {
-                        if (d1score > 0)
-                            d1score = 0;
-                        d1score--;
-                    }
-                    else if (board[boardCol + i][boardRow + i] == EMPTY)
-                    {
-                        d1score = 0;
-                    }
-                    if (std::abs(d1score) == _k) {
-                        return d1score > 0 ? 500 : -500;
-                    }
-
-
-                    if (board[boardCol + i][boardRow + (_k - i - 1)] == US)
-                    {
-                        if (d2score < 0)
-                            d2score = 0;
-                        d2score++;
-                    }
-                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == ENEMY)
-                    {
-                        if (d2score > 0)
-                            d2score = 0;
-                        d2score--;
-                    }
-                    else if (board[boardCol + i][boardRow + (_k - i - 1)] == EMPTY)
-                    {
-                        d2score = 0;
-                    }
-                    if (std::abs(d2score) == _k) {
-                        return d2score > 0 ? 500 : -500;
-                    }
-                }
-            }
-        }
-
-        return 0;
-
     }
     pthread_t _builder;
     pthread_mutex_t _building;
